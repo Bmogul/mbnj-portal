@@ -76,5 +76,8 @@ label.inputlabel{
     text-align: left;
 }
 form.loginform{
-    text-align: left;
+    text-align: center;
+}
+div h2{
+    font-size: 40;
 }
