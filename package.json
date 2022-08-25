@@ -1,0 +1,19 @@
+{
+  "name": "mbnj-portal",
+  "version": "1.0.0",
+  "description": "git",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Bmogul/mbnj-portal.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Bmogul/mbnj-portal/issues"
+  },
+  "homepage": "https://github.com/Bmogul/mbnj-portal#readme"
+}
