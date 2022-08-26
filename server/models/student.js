@@ -35,4 +35,8 @@ Student.prototype.setFamily = (family, parents) => {
     this.parents = parents;
 }
 
+Student.prototype.setAttendanceClass = (attendanceClass) => {
+    this.attendanceClass = attendanceClass;
+}
+
 module.exports = Student;

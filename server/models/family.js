@@ -16,6 +16,8 @@ let Family = (props) => {
     }
 
     newFamily.address = _.startCase(_.trim(newFamily.address))
+
+    return newFamily;
 }
 
 Family.prototype.addParents = (parents) => {

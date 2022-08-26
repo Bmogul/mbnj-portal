@@ -19,7 +19,9 @@ let Parent = (props) => {
         throw new Error("Invalid email address.")
     }
 
-    let newFamily = props;
+    let newParent = props;
+
+    return newParent;
 }
 
 module.exports = Parent;
