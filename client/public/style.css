@@ -62,7 +62,7 @@ div.loginbox{
     color: white;
 }
 div.parent{
-    display: flex;
+	display: flex;
 }
 input.txt{
     border-radius: 15px;
