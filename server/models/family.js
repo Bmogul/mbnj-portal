@@ -59,7 +59,8 @@ const familySchema = {
                             // }
                         }
                     }
-                }
+                },
+                required: ["its", "name", "phone", "emails"]
             }
         },
         tokens: {
