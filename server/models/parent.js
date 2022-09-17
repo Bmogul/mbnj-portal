@@ -9,7 +9,6 @@ addFormats(ajv)
 ajv.addFormat('phone', /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/)
 
 const parentSchema = {
-    $id: "parentSchema",
     type: "object",
     properties: {
         its: {

@@ -1,27 +1,280 @@
 const validator = require("validator");
+const _ = require('lodash')
+const Ajv = require('ajv')
+const ajv = new Ajv()
+const addFormats = require("ajv-formats")
 
-let Staff = (props) => {
-    const requiredKeys = ["its", "name", "role", "phone"];
-    let propFields = props.keys();
+addFormats(ajv)
 
-    const validInfo = propFields.every(val => requiredKeys.includes(val));
+ajv.addFormat('phone', /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/)
 
-    if(!validInfo) {
-        const missingFields = requiredKeys.filter(val => !propFields.includes(val));
-        throw new Error("Missing fields: " + missingFields);
-    }
+const staffSchema = {
+    type: "object",
+    properties: {
+        its: {
+            type: "string",
+            minLength: 8,
+            maxLength: 8,
+        },
+        name: {
+            type: "string"
+        },
+        phone: {
+            type: "string",
+            format: "phone"
+        },
+        role: {
+            type: "array",
+            items: {
+                type: "string",
+                enum: ["teacher", "masuleen","headMoallim", "admin"]
+            }
+        },
+        password: {
+            type: "string"
+        },
+        tokens: {
+            type: "array"
+        },
+        attendanceClass: {
+            type: "object",
+            properties: {
+                id: {
+                    type: "string"
+                },
+                name: {
+                    type: "string"
+                },
+                teachers: {
+                    type: "array",
+                    items: {
+                        type: "object",
+                        properties: {
+                            name: {
+                                type: "string"
+                            },
+                            phone: {
+                                type: "string",
+                                format: "phone"
+                            }
+                        },
+                        required: ["name", "phone"]
+                    }
+                }
+            },
+            required: ["id", "name", "teachers"]
+        },
+        classes: {
+            type: "object",
+            properties: {
+                Period1: {
+                    type: "object",
+                    properties: {
+                        id: {
+                            type: "string"
+                        },
+                        name: {
+                            type: "string"
+                        },
+                        teachers: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    name: {
+                                        type: "string"
+                                    },
+                                    phone: {
+                                        type: "string",
+                                        format: "phone"
+                                    }
+                                },
+                                required: ["name", "phone"]
+                            }
+                        }
+                    },
+                    required: ["id", "name", "teachers"]
+                },
+                Period2: {
+                    type: "object",
+                    properties: {
+                        id: {
+                            type: "string"
+                        },
+                        name: {
+                            type: "string"
+                        },
+                        teachers: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    name: {
+                                        type: "string"
+                                    },
+                                    phone: {
+                                        type: "string",
+                                        format: "phone"
+                                    }
+                                },
+                                required: ["name", "phone"]
+                            }
+                        }
+                    },
+                    required: ["id", "name", "teachers"]
+                },
+                Period3: {
+                    type: "object",
+                    properties: {
+                        id: {
+                            type: "string"
+                        },
+                        name: {
+                            type: "string"
+                        },
+                        teachers: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    name: {
+                                        type: "string"
+                                    },
+                                    phone: {
+                                        type: "string",
+                                        format: "phone"
+                                    }
+                                },
+                                required: ["name", "phone"]
+                            }
+                        }
+                    },
+                    required: ["id", "name", "teachers"]
+                },
+                Period4: {
+                    type: "object",
+                    properties: {
+                        id: {
+                            type: "string"
+                        },
+                        name: {
+                            type: "string"
+                        },
+                        teachers: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    name: {
+                                        type: "string"
+                                    },
+                                    phone: {
+                                        type: "string",
+                                        format: "phone"
+                                    }
+                                },
+                                required: ["name", "phone"]
+                            }
+                        }
+                    },
+                    required: ["id", "name", "teachers"]
+                },
+                Period5: {
+                    type: "object",
+                    properties: {
+                        id: {
+                            type: "string"
+                        },
+                        name: {
+                            type: "string"
+                        },
+                        teachers: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    name: {
+                                        type: "string"
+                                    },
+                                    phone: {
+                                        type: "string",
+                                        format: "phone"
+                                    }
+                                },
+                                required: ["name", "phone"]
+                            }
+                        }
+                    },
+                    required: ["id", "name", "teachers"]
+                },
+                Period6: {
+                    type: "object",
+                    properties: {
+                        id: {
+                            type: "string"
+                        },
+                        name: {
+                            type: "string"
+                        },
+                        teachers: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    name: {
+                                        type: "string"
+                                    },
+                                    phone: {
+                                        type: "string",
+                                        format: "phone"
+                                    }
+                                },
+                                required: ["name", "phone"]
+                            }
+                        }
+                    },
+                    required: ["id", "name", "teachers"]
+                },
+                Period7: {
+                    type: "object",
+                    properties: {
+                        id: {
+                            type: "string"
+                        },
+                        name: {
+                            type: "string"
+                        },
+                        teachers: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    name: {
+                                        type: "string"
+                                    },
+                                    phone: {
+                                        type: "string",
+                                        format: "phone"
+                                    }
+                                },
+                                required: ["name", "phone"]
+                            }
+                        }
+                    },
+                    required: ["id", "name", "teachers"]
+                }
+            }
+        }
 
-    let newStaff = props;
+    },
+    required: ["its", "name", "phone", "role", "password", "classes"]
+}
 
-    if(!newStaff.hasOwnProperty('classes')) {
-        newStaff.classes = null;
-    }
+const validate = ajv.compile(staffSchema)
 
-    if(!newStaff.hasOwnProperty('attendanceClass')) {
-        newStaff.attendanceClass = null;
-    }
-
-    return newStaff;
+const Staff = (props) => {
+    const valid = validate(props)
+    return {valid: valid, errors: validate.errors}
 }
 
 module.exports = Staff;
