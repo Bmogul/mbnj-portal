@@ -8,6 +8,7 @@
     <title>mbnj</title>
 </head>
 <body>
+    
     <img class="background" src="../masjid.jpeg"/>
     <div class="pattern"></div>
     <div class="tint"></div>
@@ -15,13 +16,13 @@
         <div class="loginbox">
             <h1>AL-MADRASAH TUL <br/> BURHANIYAH NJ</h1>
             <img src="../accent.png" alt="" class="accent">
-            <form class="loginform">
+            <form class="loginform" id="loginForm" action="./portal.html">
     
                 <label class="inputlabel">ITS</label><br/>
-                <input class="txt" type="text"/> <br/>
+                <input class="txt" id="its" type="text"/> <br/>
                 <label class="inputlabel">Password</label><br/>
-                <input class="txt" type="password"/> <br />
-                <input class="submit" type="submit" />
+                <input class="txt" id="psswd" type="password"/> <br />
+                <input class="submit" id="submitBtn" type="submit" />
             </form>
             <br/>
             <br/>
@@ -29,7 +30,8 @@
             <a href="./parentlogin.html">Parent Login</a>
         </div>
     </div>
-
+    <script src="//cdnjs.cloudflare.com/ajax/libs/validate.js/0.13.1/validate.min.js"></script>
+<script type="module" src="../script/login.js"></script>
 
 </body>
 </html>

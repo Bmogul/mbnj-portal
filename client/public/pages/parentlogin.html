@@ -8,7 +8,7 @@
     <title>mbnj</title>
 </head>
 <body>
-    <img class="background" src="../masjid.jpeg"/>
+    <img class="background" src="../masjid.jpeg" action="./portal.html">
     <div class="pattern"></div>
     <div class="tint"></div>
     <div class="parent">
@@ -18,10 +18,10 @@
             <form class="loginform">
     
                 <label class="inputlabel">Email</label><br/>
-                <input class="txt" type="text"/> <br/>
+                <input class="txt" id="email" type="text"/> <br/>
                 <label class="inputlabel">Password</label><br/>
-                <input class="txt" type="password"/> <br />
-                <input class="submit" type="submit" />
+                <input class="txt" id="psswd" type="password"/> <br />
+                <input class="submit" id="submitBtn" type="submit" />
             </form>
             <br/>
             <br/>
@@ -30,6 +30,7 @@
         </div>
     </div>
 
-
+    <script src="//cdnjs.cloudflare.com/ajax/libs/validate.js/0.13.1/validate.min.js"></script>
+<script type="module" src="../script/login.js"></script>
 </body>
 </html>
