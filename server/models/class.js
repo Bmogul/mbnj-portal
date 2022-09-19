@@ -32,14 +32,19 @@ const classSchema = {
             }
         }
     },
-    required: ["id", "name", "teachers"]
+    required: ["id", "name", "teachers"],
+    additionalProperties: false
 }
 
 validate = ajv.compile(classSchema)
 
-let Class = (props) => {
+let Class = (props, callback) => {
     const valid = validate(props)
-    return {valid: valid, errors: validate.errors}
+    if(valid) {
+        callback(null)
+    } else {
+        callback(validate.errors[0].message)
+    }
 }
 
 module.exports = Class;

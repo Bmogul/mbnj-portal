@@ -125,14 +125,19 @@ const studentSchema = {
             }
         }
     },
-    required: ["its", "firstName", "lastName", "fullName", "grade", "gradeNum", "gender", "dob", "allergies", "feesPaid", "booksCollected", "attendanceClass", "family", "parents", "status"]
+    required: ["its", "firstName", "lastName", "fullName", "grade", "gradeNum", "gender", "dob", "allergies", "feesPaid", "booksCollected", "attendanceClass", "family", "parents", "status"],
+    additionalProperties: false
 }
 
 const validate = ajv.compile(studentSchema)
 
-const Student = (props) => {
+const Student = (props, callback) => {
     const valid = validate(props)
-    return {valid: valid, errors: validate.errors}
+    if(valid) {
+        callback(null)
+    } else {
+        callback(validate.errors[0].message)
+    }
 }
 
 module.exports = Student;

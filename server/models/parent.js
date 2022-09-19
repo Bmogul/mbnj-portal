@@ -41,14 +41,19 @@ const parentSchema = {
             }
         }
     },
-    required: ["its", "name", "phone", "emails"]
+    required: ["its", "name", "phone", "emails"],
+    additionalProperties: false
 }
 
 const validate = ajv.compile(parentSchema)
 
-const Parent = (props) => {
+const Parent = (props, callback) => {
     const valid = validate(props)
-    return {valid: valid, errors: validate.errors}
+    if(valid) {
+        callback(null)
+    } else {
+        callback(validate.errors[0].message)
+    }
 }
 
 module.exports = Parent;

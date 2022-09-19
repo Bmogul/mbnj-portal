@@ -67,14 +67,19 @@ const familySchema = {
             type: "array"
         }
     },
-    required: ["id", "address", "username", "password", "parents", "tokens"]
+    required: ["id", "address", "username", "password", "parents", "tokens"],
+    additionalProperties: false
 }
 
 const validate = ajv.compile(familySchema)
 
-const Family = (props) => {
+const Family = (props, callback) => {
     const valid = validate(props)
-    return {valid: valid, errors: validate.errors}
+    if(valid) {
+        callback(null)
+    } else {
+        callback(validate.errors[0].message)
+    }
 }
 
 module.exports = Family;

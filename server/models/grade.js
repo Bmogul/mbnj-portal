@@ -57,14 +57,19 @@ const gradeSchema = {
             }
         }
     },
-    required: ["name", "masuleen", "classes"]
+    required: ["name", "masuleen", "classes"],
+    additionalProperties: false
 }
 
 validate = ajv.compile(gradeSchema)
 
-let Grade = (props) => {
+let Grade = (props, callback) => {
     const valid = validate(props)
-    return {valid: valid, errors: validate.errors}
+    if(valid) {
+        callback(null)
+    } else {
+        callback(validate.errors[0].message)
+    }
 }
 
 module.exports = Grade;
