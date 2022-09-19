@@ -4,7 +4,6 @@
 }
 body{
     background-color: #B5C6F1;
-
 }
 img.background{
     position: fixed;
@@ -14,7 +13,6 @@ img.background{
     height:100vh;
     object-fit: cover;
     z-index:-3;
-    /* transition: ease all .5s; */
 }
 img.accent{
     object-fit: cover;
@@ -29,12 +27,9 @@ div.pattern{
     left:0;
     width:100vw;
     height:100vh;
-    /* transition: ease all .5s; */
   
     background-image: url("islamicgeo.png");
-    /* background-repeat: repeat;
-    background-size: 50%; 
-    opacity: .2; */
+
     z-index: -2;
 } 
 div.tint{
@@ -48,17 +43,13 @@ div.tint{
     z-index: -1;
 }
 div.loginbox{
-    /* margin-top: 150px;
-    margin-left: 150px; */
     background: #0D3962;
     border-radius: 25px;
-    /* background: #73AD21; */
     padding: 20px; 
     width: 400px;
     height: 600px; 
     text-align: center;
     color: white;
-    grid-area:login;
     z-index: 1;
     transition: ease all .5s;
     transition-delay: 250ms;
@@ -76,13 +67,11 @@ div.loginbox{
     transition: ease all .5s;
 } */
 div.parent{
-	display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    /* grid-template-rows: 1fr 4fr; */
-    /* grid-column-gap: 1em; */
-    grid-template-areas: 
-    "login logo spacer";
-    /* margin-top: 50px; */    
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 }
 input.txt{
     border-radius: 15px;
@@ -90,39 +79,56 @@ input.txt{
     margin-bottom: 10%;
     box-sizing: border-box;
     height: 30px;
+    padding: 15px;
+}
+input.txt:hover{
+    /* border : #B5C6F1; */
+    box-shadow: 0 0 5px #B5C6F1;
+    border: 1px solid #B5C6F1;
+
 }
 label.inputlabel{
     margin: 5px;
     text-align: left;
+    margin-bottom: 100px;
 }
 form.loginform{
     text-align: center;
     z-index: 3;
 }
-div h2{
+div h1{
     z-index: 3;
-    font-size: 40;
+    margin-top: 30px;
+}
+input.submit{
+    border-radius: 18px;
+    outline: none;
+    border: none;
+    width: 70px;
+    height: 20px;
+}
+input.submit:hover{
+    color: white;
+    background-color: #414141;
+}
+a{
+    color: rgb(178, 178, 178);
+}
+a:hover{
+    color: rgb(119, 119, 119);
 }
 
-@media only screen and (max-width: 853px){
+@media only screen and (max-width: 700px){
     div.parent{
-        grid-template-columns: 1fr;
+        grid-template-columns: .25fr .5fr .25fr;
         grid-template-rows: 1fr;
         grid-template-areas: 
-        "login";
+        "spacer login spacer";
     }
     div.loginbox{
         height: 100vh;
         width: 100vh;
     }
-    /* /* div.logo{
-        visibility: hidden;
-    } */
-    /* div.tint{
-        visibility: hidden;
-    }  */
-    /* img.background{visibility: hidden;} */
-    /* div.pattern{z-index: 2;} */
     body{
         background-color: #0D3962;
     }
