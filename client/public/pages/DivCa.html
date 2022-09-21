@@ -1,11 +1,11 @@
 <div class="tabcontent" id="ClassAttendance">
-    <select name="class name" id="class" value="hello">
-        <option value="">Select a class</option>
+    <select name="class name" id="classesDropdown" onchange="loadClass(this)">
+        <option value="default">Select a class</option>
     </select>
-    <button onclick="markAllP(this)">Mark All Present</button>
-    <button onclick="markAllA(this)">Mark All Absent</button>
+    <button onclick="markAllP()">Mark All Present</button>
+    <button onclick="markAllA()">Mark All Absent</button>
     <div id="studentsCA">
-        <div class="studentCA default">
+        <!-- <div class="studentCA default">
             <h2>Murtaza Neemuchwala</h2>
             <form action="">
                 <label>Present:&#9;</label>
@@ -85,7 +85,7 @@
                 <label for="">Absent:&#9;</label>
                 <input type="radio" name="attendance" value="absent" onclick="absentA(this)">
             </form>
-        </div>
+        </div> -->
     </div>
     <button type="submit" class="submitData">Submit</button>
     <script src="../script/CAhandler.js"></script>

@@ -18,10 +18,11 @@ div#studentsCA{
     gap: 1rem;
     /* margin: 10px; */
     padding: 10px;
+    transition: ease 1s;
 }
 
 .present{
-    background-color: #5db75d;
+    background-color: #62b562;
 }
 .absent{
     background-color: #dd6d6d;
