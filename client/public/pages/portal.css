@@ -13,9 +13,11 @@ ul.navList{
     background-color: #0D3962;
     margin: 0;
     padding: 5px;
-    opacity: 75%;
+    opacity: 90%;
     height: 90px;
     margin-bottom: 50px;
+    color: white;
+    position: relative;
 }
 ul.navList li{
     display: inline;

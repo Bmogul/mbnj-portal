@@ -30,7 +30,7 @@ const validate = ()=>{
             return false;
         }
     }
-    if(!psswd.value){
+    if(!psswd.value || psswd.value.length < 8 || !/[A-Z]/.test(psswd.value)){
         alert('Please input a valid Password')
         return false;
     }
@@ -42,10 +42,8 @@ submit.onclick = () =>{
     if(validate()){
         // check to see if in db and get login token
         sessionStorage.setItem('login_token', 12804982);
-        alert("LOGGED IN")
         return true;
     }else{
-        alert("FAILED")
         return false;
     }
 }

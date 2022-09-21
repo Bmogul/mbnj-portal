@@ -15,39 +15,64 @@
         // All pages, R / W permissions
 const permissions = {
     teacher:{
-        classAttendace:false,
+        classAttendace:true,    // read only
         studentLookup:false,
-        scheduleAbsence:true,
+        scheduleAbsence:true,   // no export history
         classHistory:false
     },
     classTeacher:{
-        classAttendace:true,
-        studentLookup:true,
-        scheduleAbsence:true,
-        classHistory:true
-    },
-    attendanceTeacher:{
-        classAttendace:true,
-        studentLookup:false,
-        scheduleAbsence:true,
-        classHistory:false
+        classAttendace:true,    // only their main class or assigned classes
+        studentLookup:true,     // only their students
+        scheduleAbsence:true,   // no export history
+        classHistory:true       // only their class
     },
     officeStaff:{
-        classAttendace:true,
-        studentLookup:true,
-        scheduleAbsence:true,
-        classHistory:true
+        classAttendace:true,    // Read Write for all classes
+        studentLookup:true,     // Lookup all students
+        scheduleAbsence:true,   // export report maybe?
+        classHistory:true       // all classes
     },
     headMoalim:{
-        classAttendace:true,
-        studentLookup:true,
-        scheduleAbsence:true,
-        classHistory:true
+        classAttendace:true,    // Read Write for all classes
+        studentLookup:true,     // Lookup all students, Edit student data
+        scheduleAbsence:true,   // export report for staff atendance
+        classHistory:true       // all classes
     },
     Admin:{
-        classAttendace:true,
-        studentLookup:true,
-        scheduleAbsence:true,
-        classHistory:true
+        classAttendace:true,    // Read Write for all classes
+        studentLookup:true,     // Lookup all students, Edit student data
+        scheduleAbsence:true,   // export report for staff attendance
+        classHistory:true       // all classes
     }
+}
+// retrive permission level from db 
+const permission = 'Admin'
+const currentPermissions = permissions[permission]
+// console.log(currentPermissions)
+
+const tabsDiv = document.getElementById('tab-div')
+
+if(currentPermissions.classAttendace){
+    let tab = document.createElement('button')
+    tab.className = 'tablinks active'
+    tab.innerHTML = 'Class<br/>Attendance'
+    tabsDiv.appendChild(tab)
+}
+if(currentPermissions.studentLookup){
+    let tab = document.createElement('button')
+    tab.className = 'tablinks'
+    tab.innerHTML = 'Student<br/>Lookup'
+    tabsDiv.appendChild(tab)
+}
+if(currentPermissions.scheduleAbsence){
+    let tab = document.createElement('button')
+    tab.className = 'tablinks'
+    tab.innerHTML = 'Schedule<br/>Absence'
+    tabsDiv.appendChild(tab)
+}
+if(currentPermissions.classHistory){
+    let tab = document.createElement('button')
+    tab.className = 'tablinks'
+    tab.innerHTML = 'Class<br/>History'
+    tabsDiv.appendChild(tab)
 }
