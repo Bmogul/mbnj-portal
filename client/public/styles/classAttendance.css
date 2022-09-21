@@ -1,0 +1,31 @@
+div.studentCA{
+    /* background-color: #EBEBEB; */
+    height: 100px;
+    padding: 10px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+    transition: ease 0.5s;
+}
+
+.studentCA:hover{
+    filter: brightness(115%);
+}
+
+div#studentsCA{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1rem;
+    /* margin: 10px; */
+    padding: 10px;
+}
+
+.present{
+    background-color: #5db75d;
+}
+.absent{
+    background-color: #dd6d6d;
+}
+.default{
+    background-color: #EBEBEB;
+}

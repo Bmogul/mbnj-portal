@@ -5,7 +5,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="portal.css">
+    <link rel="stylesheet" href="../styles/portal.css">
+    <link rel="icon" type="image/x-icon" href="../madrasalogo.png">
     <title>Staff Portal</title>
 </head>
 
@@ -29,10 +30,12 @@
         <div class="tab" id="tab-div">
         </div>
         <div id="tabs">
-            <div id="London" class="tabcontent">
-                <h3>London</h3>
-                <p>London is the capital city of England.</p>
-            </div>
+            <?php 
+                include('DivCa.html');  // class Attendance
+                include('DivSl.html');  // student lookup
+                include('DivSa.html');  // schedule absence
+                include('DivCh.html');  // class history
+            ?>
         </div>
 
 

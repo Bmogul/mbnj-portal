@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400&display=swap');
 @import url('./nav.css');
-
+@import url('classAttendance.css');
 * {
   font-family: 'Ubuntu', sans-serif;
 }
