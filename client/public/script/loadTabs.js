@@ -51,12 +51,15 @@ const currentPermissions = permissions[permission]
 // console.log(currentPermissions)
 
 const tabsDiv = document.getElementById('tab-div')
+const tabContentDiv = document.getElementById('tabs')
 
 if(currentPermissions.classAttendace){
     let tab = document.createElement('button')
     tab.className = 'tablinks active'
     tab.innerHTML = 'Class<br/>Attendance'
     tabsDiv.appendChild(tab)
+
+    let tabContent = document.createElement('div')
 }
 if(currentPermissions.studentLookup){
     let tab = document.createElement('button')
