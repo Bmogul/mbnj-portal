@@ -1,24 +1,45 @@
 const validator = require("validator");
+const _ = require('lodash')
+const Ajv = require('ajv')
+const ajv = new Ajv()
+const addFormats = require("ajv-formats")
+addFormats(ajv)
 
-let StaffAttendance = (props) => {
-    const requiredKeys = ["date", "its", "present"];
-    let propFields = props.keys();
-
-    const validInfo = propFields.every(val => requiredKeys.includes(val));
-
-    if(!validInfo) {
-        const missingFields = requiredKeys.filter(val => !propFields.includes(val));
-        throw new Error("Missing fields: " + missingFields);
-    }
-
-    if(!validator.isBoolean(props.present, {loose: true}) {
-        throw new Error("Invalid present field.");
-    }
-
-    let newStaffAttendance = props;
-    newStaffAttendance.present = (props.present.toLowerCase() === 'true');
-
-    return newStaffAttendance;
+const attendanceSchema = {
+    type: "object",
+    properties: {
+        date: {
+            type: "string",
+            format: "date"
+        },
+        its: {
+            type: "string",
+            minLength: 8,
+            maxLength: 8
+        },
+        present: {
+            type: "string",
+            enum: ["Present", "Absent", "Late-In", "Early-Out"]
+        },
+        reasonOfAbsence: {
+            type: "string"
+        },
+    },
+    required: ["date", "its", "present"],
+    additionalProperties: false
 }
 
-module.exports = StaffAttendance;
+
+
+const validate = ajv.compile(attendanceSchema)
+
+const staffAttendance = (props, callback) => {
+    const valid = validate(props)
+    if(valid) {
+        callback(null)
+    } else {
+        callback(validate.errors[0].message)
+    }
+}
+
+module.exports = staffAttendance;
