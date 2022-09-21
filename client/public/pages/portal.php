@@ -21,25 +21,36 @@
                     </button>
                     <div class="dropdown-content">
                         <a>Moiz Sabir</a>
-                        <a href="#">Logout</a>
+                        <a href="./login.html" onclick="logout()">Logout</a>
                     </div>
                   </div> 
             </li>
         </ul>
+        <div class="alert alert-Nonactive" id="alertBox">
+            Form Submitted
+        </div>
+        <div class="spacer"></div>
 
         <div class="tab" id="tab-div">
         </div>
         <div id="tabs">
             <?php 
                 include('DivCa.html');  // class Attendance
-                include('DivSl.html');  // student lookup
-                include('DivSa.html');  // schedule absence
-                include('DivCh.html');  // class history
+            ?>
+            <?php
+                include('DivSl.html')   // student lookup
+            ?>
+            <?php
+                include('DivSa.html')   // schedule absence
+            ?>
+            <?php
+                include('DivCh.html')   // class history
             ?>
         </div>
 
 
 <script src="../script/loadTabs.js"></script>
+<script src="../script/logout.js"></script>
 </body>
 
 </html>

@@ -2,6 +2,8 @@ const classAttendanceTab = document.getElementById('ClassAttendance')
 const dropdown = document.getElementById('classesDropdown')
 const studentsDiv = document.getElementById('studentsCA')
 const students = studentsDiv.hasChildNodes ? studentsDiv.childNodes : null;
+const alertBox = document.getElementById('alertBox')
+let classMembers = null;
 
 // make request for class data available to teachers
 // currently dummy data
@@ -102,26 +104,31 @@ dropdown.value='Salesa'
 loadClass(dropdown)
 
 function loadClass(element) {
-    // retrive members of class here from db
-    // dummy data for now
+
     // console.log(ele)
     let child = studentsDiv.lastElementChild; 
     while (child) {
         studentsDiv.removeChild(child);
         child = studentsDiv.lastElementChild;
     }
+
     if(element.value == 'default')
         return;
-    let classMembers = null;
+
+    // retrive members of class here from db
+    // dummy data for now
+    classMembers = null;
     if(element.value == "Salesa")
         classMembers = salesa;
     if(element.value == "Saniya")
         classMembers = saniya;
     if(element.value == "Awala")
         classMembers = awala;
+
     classMembers.forEach(student => {
         let studentDiv = document.createElement('div')
         studentDiv.className = "studentCA default"
+        studentDiv.id=student.its;
 
         let sName = document.createElement('h2')
         sName.innerHTML = student.fName+"<br/>"+student.lName
@@ -152,6 +159,10 @@ function loadClass(element) {
     })
 }
 
+// function doubleClickAttendance(){
+
+// }
+
 function presentA() {
     this.parentNode.parentNode.className = "studentCA present"
 }
@@ -174,7 +185,38 @@ function markAllA() {
         if (student.nodeType == Node.ELEMENT_NODE) {
             let child = student.childNodes[1].childNodes[4]
             child.checked = true;
-            child.parentNode.parentNode.className = "studentCA absent"
+            student.className = "studentCA absent"
+            // console.log(student.childNodes[1].)
         }
     })
+}
+
+function submitAttendanceRecord(){
+    // will push attendance data to database
+    const record = []
+    
+    students.forEach(student =>{
+        if(student.nodeType == Node.ELEMENT_NODE){
+            let present = student.childNodes[1].childNodes[1].checked ? true : false;
+            // let absent = student.childNodes[1].childNodes[4]
+            if(!present){
+                student.childNodes[1].childNodes[4].checked = true
+                student.className = "studentCA absent"
+            }
+            record.push({'its':student.id, present})
+        }
+    })
+    // this is where data will be pushed to final record which gets pushed into the DB
+    for(let i = 0; i < record.length; i++){
+        // console.log(classMembers[i].present, record[i].present)
+        if(!classMembers[i].present && record[i].present)
+            classMembers[i].present = true
+    }
+
+    // alertBox.innerHTML = "Attendance Submitted"
+    // alertBox.className = 'alert alert-Active'
+    // setTimeout(() =>{
+    //     alertBox.className = 'alert alert-Nonactive'
+    // },2000)
+    alert("Attendance Submitted")
 }

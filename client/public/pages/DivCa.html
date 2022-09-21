@@ -1,92 +1,12 @@
 <div class="tabcontent" id="ClassAttendance">
-    <select name="class name" id="classesDropdown" onchange="loadClass(this)">
+    <h1>Class Attendance</h1>
+    <select class="Attendance" name="class name" id="classesDropdown" onchange="loadClass(this)" title="Select Class" >
         <option value="default">Select a class</option>
     </select>
-    <button onclick="markAllP()">Mark All Present</button>
-    <button onclick="markAllA()">Mark All Absent</button>
+    <button class="Attendance" onclick="markAllP()">Mark All Present</button>
+    <button class="Attendance" onclick="markAllA()">Mark All Absent</button>
     <div id="studentsCA">
-        <!-- <div class="studentCA default">
-            <h2>Murtaza Neemuchwala</h2>
-            <form action="">
-                <label>Present:&#9;</label>
-                <input type="radio" name="attendance" value="present" id="present" onclick="presentA(this)"> <br />
-                <label for="">Absent:&#9;</label>
-                <input type="radio" name="attendance" value="absent" onclick="absentA(this)">
-            </form>
-        </div>
-        <div class="studentCA default">
-            <h2>Murtaza Neemuchwala</h2>
-            <form action="">
-                <label>Present:&#9;</label>
-                <input type="radio" name="attendance" value="present" id="present" onclick="presentA(this)"> <br />
-                <label for="">Absent:&#9;</label>
-                <input type="radio" name="attendance" value="absent" onclick="absentA(this)">
-            </form>
-        </div>
-        <div class="studentCA default">
-            <h2>Murtaza Neemuchwala</h2>
-            <form action="">
-                <label>Present:&#9;</label>
-                <input type="radio" name="attendance" value="present" id="present" onclick="presentA(this)"> <br />
-                <label for="">Absent:&#9;</label>
-                <input type="radio" name="attendance" value="absent" onclick="absentA(this)">
-            </form>
-        </div>
-        <div class="studentCA default">
-            <h2>Murtaza Neemuchwala</h2>
-            <form action="">
-                <label>Present:&#9;</label>
-                <input type="radio" name="attendance" value="present" id="present" onclick="presentA(this)"> <br />
-                <label for="">Absent:&#9;</label>
-                <input type="radio" name="attendance" value="absent" onclick="absentA(this)">
-            </form>
-        </div>
-        <div class="studentCA default">
-            <h2>Murtaza Neemuchwala</h2>
-            <form action="">
-                <label>Present:&#9;</label>
-                <input type="radio" name="attendance" value="present" id="present" onclick="presentA(this)"> <br />
-                <label for="">Absent:&#9;</label>
-                <input type="radio" name="attendance" value="absent" onclick="absentA(this)">
-            </form>
-        </div>
-        <div class="studentCA default">
-            <h2>Murtaza Neemuchwala</h2>
-            <form action="">
-                <label>Present:&#9;</label>
-                <input type="radio" name="attendance" value="present" id="present" onclick="presentA(this)"> <br />
-                <label for="">Absent:&#9;</label>
-                <input type="radio" name="attendance" value="absent" onclick="absentA(this)">
-            </form>
-        </div>
-        <div class="studentCA default">
-            <h2>Murtaza Neemuchwala</h2>
-            <form action="">
-                <label>Present:&#9;</label>
-                <input type="radio" name="attendance" value="present" id="present" onclick="presentA(this)"> <br />
-                <label for="">Absent:&#9;</label>
-                <input type="radio" name="attendance" value="absent" onclick="absentA(this)">
-            </form>
-        </div>
-        <div class="studentCA default">
-            <h2>Murtaza Neemuchwala</h2>
-            <form action="">
-                <label>Present:&#9;</label>
-                <input type="radio" name="attendance" value="present" id="present" onclick="presentA(this)"> <br />
-                <label for="">Absent:&#9;</label>
-                <input type="radio" name="attendance" value="absent" onclick="absentA(this)">
-            </form>
-        </div>
-        <div class="studentCA default">
-            <h2>Murtaza Neemuchwala</h2>
-            <form action="">
-                <label>Present:&#9;</label>
-                <input type="radio" name="attendance" value="present" id="present" onclick="presentA(this)"> <br />
-                <label for="">Absent:&#9;</label>
-                <input type="radio" name="attendance" value="absent" onclick="absentA(this)">
-            </form>
-        </div> -->
     </div>
-    <button type="submit" class="submitData">Submit</button>
+    <button class="Attendance" type="submit" class="submitData" onclick="submitAttendanceRecord()">Submit</button>
     <script src="../script/CAhandler.js"></script>
 </div>

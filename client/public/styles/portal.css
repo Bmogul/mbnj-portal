@@ -58,6 +58,27 @@ body {
   animation: fadeEffect 1s;
 }
 
+.alert {
+  padding: 20px;
+  background-color: #f44336; /* Red */
+  color: white;
+  margin-bottom: 15px;
+  transition: ease 2ms;
+  /* width: 100px; */
+  /* justify-self: center; */
+  z-index: 2;
+}
+.alert-Active{
+  display: block;
+}
+.alert-Nonactive{
+  display: none;
+}
+
+.spacer{
+  margin: 80px;
+}
+
 @keyframes fadeEffect {
   from{opacity: 0;}
   to{opacity: 1;}

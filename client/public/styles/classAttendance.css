@@ -30,3 +30,15 @@ div#studentsCA{
 .default{
     background-color: #EBEBEB;
 }
+
+.Attendance{
+    margin: 10px;
+}
+.Attendance{
+    border-radius: 18px;
+    border: none;
+    padding: 10px;
+}
+button.Attendance:hover{
+    filter: brightness(80%);
+}
