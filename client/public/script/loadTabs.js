@@ -70,7 +70,7 @@ const permissions = {
     }
 }
 // retrive permission level from db 
-const permission = 'teacher'
+const permission = 'Admin'
 const currentPermissions = permissions[permission]
 // console.log(currentPermissions)
 
