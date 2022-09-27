@@ -1,24 +1,45 @@
 const validator = require("validator");
+const _ = require('lodash')
+const Ajv = require('ajv')
+const ajv = new Ajv()
+const addFormats = require("ajv-formats")
+addFormats(ajv)
 
-let Attendance = (props) => {
-    const requiredKeys = ["date", "its", "present"];
-    let propFields = props.keys();
+const attendanceSchema = {
+    type: "object",
+    properties: {
+        date: {
+            type: "string",
+            format: "date"
+        },
+        its: {
+            type: "string",
+            minLength: 8,
+            maxLength: 8
+        },
+        present: {
+            type: "string",
+            enum: ["Present", "Absent", "Late-In", "Early-Out"]
+        },
+        reasonOfAbsence: {
+            type: "string"
+        },
+    },
+    required: ["date", "its", "present"],
+    additionalProperties: false
+}
 
-    const validInfo = propFields.every(val => requiredKeys.includes(val));
 
-    if(!validInfo) {
-        const missingFields = requiredKeys.filter(val => !propFields.includes(val));
-        throw new Error("Missing fields: " + missingFields);
+
+const validate = ajv.compile(attendanceSchema)
+
+const Attendance = (props, callback) => {
+    const valid = validate(props)
+    if(valid) {
+        callback(null)
+    } else {
+        callback(validate.errors[0].message)
     }
-    
-    if(!validator.isBoolean(props.present, {loose: true}) {
-        throw new Error("Invalid present field.");
-    }
-
-    let newAttendance = props;
-    newAttendance.present = (props.present.toLowerCase() === 'true');
-
-    return newAttendance;
 }
 
 module.exports = Attendance;
