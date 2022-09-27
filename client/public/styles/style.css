@@ -28,7 +28,7 @@ div.pattern{
     width:100vw;
     height:100vh;
   
-    background-image: url("islamicgeo.png");
+    background-image: url("../islamicgeo.png");
 
     z-index: -2;
 } 
