@@ -9,8 +9,7 @@ const familyAuth = async (req, res, next) => {
         const decoded = jwt.verify(token, process.env.CRYPT);
         const family = await familyRef.where('id', '==', decoded.id).where('tokens', 'array-contains', token).get()
         if(!family)
-            throw new Error();
-
+            throw new Error()
         req.token = token;
         req.member = member;
         next();

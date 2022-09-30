@@ -5,8 +5,10 @@ const bcyrpt = require('bcryptjs')
 const Family = require('../models/family');
 const familyRef = db.collection('family');
 
-findByCredentials = async(id, password) => {
-    const familyDocRef = familyRef.doc(String(id))
+findByCredentials = async(username, password) => {
+    console.log(username);
+    console.log(password);
+    const familyDocRef = familyRef.where("username", "=", username)
     const family = await familyDocRef.get()
     if(!family.exists) {
         throw new Error('Unable to login')
@@ -28,12 +30,12 @@ generateAuthToken = async(familyDocRef) => {
 
 router.post('/family/login', async(req, res) => {
     try {
-        const familyObj = await findByCredentials(req.body.id, req.body.password)
+        const familyObj = await findByCredentials(req.body.username, req.body.password)
         const token = await generateAuthToken(familyObj.ref)
         const family = familyObj.data
         res.send({family, token})
     } catch (error) {
-        res.status(400).send(error)
+        res.send({error})
     }
 })
 
