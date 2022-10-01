@@ -4,7 +4,10 @@
   "description": "git",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/app.js",
+    "build": "cd client && npm install && npm run build",
+    "dev": "env-cmd -f ./config/dev.env node server/app.js"
   },
   "repository": {
     "type": "git",
@@ -21,10 +24,14 @@
     "ajv-formats": "^2.1.1",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
+    "dotenv": "^16.0.3",
     "express": "^4.18.1",
     "firebase-admin": "^11.0.1",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "env-cmd": "^10.1.0"
   }
 }
