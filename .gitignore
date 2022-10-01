@@ -130,5 +130,6 @@ dist
 .pnp.*
 
 ./server/test
+server/db/mbnjdb-service-account.json
 
-./server/db/mbnjdb-service-account.json
+config/dev.env
