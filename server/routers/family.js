@@ -22,7 +22,7 @@ findByCredentials = async(username, password) => {
             familyData = doc.data()
         });    
     }
-    const isMatch = (familyData.password == process.env.TEST_PASSWORD)
+    const isMatch = bcyrpt.compare(password, familyData.password)
     if(!isMatch) {
         console.log("Incorrect password");
         throw new Error("Unable to login")
@@ -45,6 +45,8 @@ router.post('/family/login', async(req, res) => {
         const familyObj = await findByCredentials(req.body.username, req.body.password)
         const token = await generateAuthToken(familyObj.id)
         const family = familyObj.data
+        delete family.password;
+        delete family.tokens;
         res.send({family, token})
     } catch (error) {
         res.send({error})
@@ -72,7 +74,7 @@ router.post('/family/logoutAll', familyAuth, async(req, res) => {
             tokens: req.family.tokens
         })
 
-        res.send()
+        res.send("Logged out all.")
     } catch (error) {
         res.status(500).send(error)
     }
@@ -97,7 +99,7 @@ router.post("/family/setup", async(req, res) => {
         familyData = ""
         const snap = await familyDocRef.get()
         if(snap.empty) {
-            throw new Error('Unable to login')
+            throw new Error('Username not found')
         } else {
             snap.forEach(doc => {
                 familyData = doc.data()
@@ -108,11 +110,11 @@ router.post("/family/setup", async(req, res) => {
             password: await bcyrpt.hash(password, 8)
         })
 
-        res.send("Password setup");
+        res.send("Password setup complete");
 
 
     } catch (error){
-        res.status().send("Invalid Credentials");
+        res.status(401).send("Invalid Credentials");
     }
 })
 
