@@ -84,4 +84,36 @@ router.get("/family/profile", familyAuth, async(req, res) => {
     res.send(req.family);
 })
 
+router.post("/family/setup", async(req, res) => {
+    try {
+        username = req.body.username;
+        def_password = req.body.def_password;
+        password = req.body.password;
+        if(def_password != process.env.DEFAULT_PASSWORD) {
+            throw new Error("Incorrect password");
+        }
+
+        const familyDocRef = familyRef.where("username", "==", username)
+        familyData = ""
+        const snap = await familyDocRef.get()
+        if(snap.empty) {
+            throw new Error('Unable to login')
+        } else {
+            snap.forEach(doc => {
+                familyData = doc.data()
+            });    
+        }
+
+        await familyRef.doc(familyData.id).update({
+            password: await bcyrpt.hash(password, 8)
+        })
+
+        res.send("Password setup");
+
+
+    } catch (error){
+        res.status().send("Invalid Credentials");
+    }
+})
+
 module.exports = router;
