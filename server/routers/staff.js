@@ -26,11 +26,11 @@ findByCredentials = async(its, password) => {
     if(!isMatch) {
         throw new Error("Unable to login")
     }
-    return {"its": staffData.its, "data": staffData}
+    return {"its": staffData.its, "data": staffData, "role": staffData.role}
 }
 
-generateAuthToken = async(its) => {    
-    const token = jwt.sign({its: its}, process.env.CRYPT, { expiresIn: '1h' });
+generateAuthToken = async(its, role) => {    
+    const token = jwt.sign({its: its, role: role}, process.env.CRYPT);
 
     const up = await staffRef.doc(its).update({
         tokens: admin.firestore.FieldValue.arrayUnion(token)
@@ -42,7 +42,7 @@ generateAuthToken = async(its) => {
 router.post('/staff/login', async(req, res) => {
     try {
         const staffObj = await findByCredentials(req.body.its, req.body.password)
-        const token = await generateAuthToken(staffObj.its)
+        const token = await generateAuthToken(staffObj.its, staffObj.role)
         const staff = staffObj.data
         delete staff.password;
         delete staff.tokens;

@@ -8,7 +8,7 @@ const staffAuth = async (req, res, next) => {
     try{
         const token = req.header('Authorization').replace('Bearer ', '');
         const decoded = jwt.verify(token, process.env.CRYPT);
-        const staff = await Staff.where('its', '==', decoded.its).get()
+        const staff = await staffRef.where('its', '==', decoded.its).get()
         if(staff.empty)
             throw new Error()
 
