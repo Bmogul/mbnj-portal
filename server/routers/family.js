@@ -24,7 +24,6 @@ findByCredentials = async(username, password) => {
     }
     const isMatch = bcyrpt.compare(password, familyData.password)
     if(!isMatch) {
-        console.log("Incorrect password");
         throw new Error("Unable to login")
     }
     return {"id": familyData.id, "data": familyData}
