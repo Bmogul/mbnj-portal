@@ -1,15 +1,36 @@
 const express = require('express');
 const router = new express.Router();
 
+// Staff
 const Staff = require('../models/staff');
 const staffRef = db.collection('staff');
+
+//Attendance
+const Attendance = require('../models/attendance');
+const attendanceRef = db.collection('attendance');
+
+//Class
+const Class = require('../models/class');
+const classRef = db.collection('class');
+
+//Grade
+const Grade = require('../models/grade');
+const gradeRef = db.collection('grade');
+
+//Student
+const Student = require('../models/student');
+const studentRef = db.collection('students');
+
+//StaffAttendance
+const StaffAttendance = require('../models/staffAttendance');
+const staffAttendanceRef = db.collection('staffAttendance');
 
 const bcyrpt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const admin = require('firebase-admin')
 
 const { auth } = require('firebase-admin');
-const staffAuth = require('../middleware/staffAuth')
+const {staffAuth, attendanceAuth} = require('../middleware/staffAuth')
 
 findByCredentials = async(its, password) => {
     const staffDocRef = staffRef.where("its", "==", its)
@@ -114,6 +135,35 @@ router.post("/staff/setup", async(req, res) => {
 
     } catch (error){
         res.status(401).send("Invalid Credentials");
+    }
+})
+
+router.get("/staff/attendanceList", attendanceAuth, async(req, res) => {
+    try {
+
+        let attendanceID = req.staff.attendanceClass.id;
+
+        let attendanceStudentsRef = studentRef.where("attendanceClass.id", "==", parseInt(attendanceID));
+        let snapshot = await attendanceStudentsRef.get();
+        if(snapshot.empty) {
+            throw new Error("No students in class");
+        }
+
+        studentsList = []
+
+        snapshot.forEach(s => {
+            let sD = s.data()
+            let sData = {
+                fullName: sD.fullName,
+                grade: sD.grade,
+                its: sD.its,
+            }
+            studentsList.push(sData)
+        })
+
+        res.send(studentsList)
+    } catch (error) {
+        res.status("502").send("Unable to fetch data.");
     }
 })
 
