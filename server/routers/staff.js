@@ -151,16 +151,27 @@ router.get("/staff/attendanceList", attendanceAuth, async(req, res) => {
 
         studentsList = []
 
-        snapshot.forEach(s => {
+        snapshot.forEach((s) => {
             let sD = s.data()
-            let sData = {
+            let date = new Date().toLocaleDateString("en-US")
+            let searchKey = date + ":" + sD.its
+            let pres = attendanceRef.doc(searchKey).get();
+
+            let presentStatus = null;
+
+            if(pres.exists) {
+                console.log("Found record");
+                present = pres.data().present
+            }
+            let sData = { 
                 fullName: sD.fullName,
                 grade: sD.grade,
                 its: sD.its,
+                present: presentStatus
             }
             studentsList.push(sData)
         })
-
+        console.log(studentsList);
         res.send(studentsList)
     } catch (error) {
         res.status("502").send("Unable to fetch data.");
