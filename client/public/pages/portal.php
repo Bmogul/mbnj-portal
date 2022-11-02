@@ -9,8 +9,9 @@
     <link rel="icon" type="image/x-icon" href="../madrasalogo.png">
     <title>Staff Portal</title>
 </head>
-
-    <!-- <div class="nav" id="navbar"> -->
+<body>
+    
+        <!-- <div class="nav" id="navbar"> -->
         <ul class="navList">
             <li><div class="logo navItem"></div></li>
             <li><h2 class="navItem" style="margin-top: 10px" >MBNJ</h2></li>
@@ -26,6 +27,8 @@
                   </div> 
             </li>
         </ul>
+
+
         <div class="alert alert-Nonactive" id="alertBox">
             Form Submitted
         </div>
@@ -51,6 +54,8 @@
 
 <script src="../script/loadTabs.js"></script>
 <script src="../script/logout.js"></script>
+<script src=”https://unpkg.com/dayjs@1.8.21/dayjs.min.js”></script>
+<script type="module" src="../script/calendar.js"></script>
 </body>
 
 </html>
