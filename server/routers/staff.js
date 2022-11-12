@@ -30,7 +30,8 @@ const jwt = require('jsonwebtoken')
 const admin = require('firebase-admin')
 
 const { auth } = require('firebase-admin');
-const {staffAuth, attendanceAuth} = require('../middleware/staffAuth')
+const {staffAuth, attendanceAuth} = require('../middleware/staffAuth');
+const { resolveRef } = require('ajv/dist/compile');
 
 findByCredentials = async(its, password) => {
     const staffDocRef = staffRef.where("its", "==", its)
@@ -150,31 +151,68 @@ router.get("/staff/attendanceList", attendanceAuth, async(req, res) => {
         }
 
         studentsList = []
+        let index = 0
+        await new Promise((resolve => { 
+            snapshot.forEach(async(s) => {
+                try {
+                    let sD = s.data()
+                    let date = new Date().toISOString().split("T")[0]
+                    let searchKey = date + ":" + sD.its
+                    let pres = await attendanceRef.doc(searchKey).get();
+                    let presentStatus = null;
 
-        snapshot.forEach((s) => {
-            let sD = s.data()
-            let date = new Date().toLocaleDateString("en-US")
-            let searchKey = date + ":" + sD.its
-            let pres = attendanceRef.doc(searchKey).get();
+                    if(pres.exists) {
+                        presentStatus = pres.data().present
+                    }
+                    let sData = { 
+                        fullName: sD.fullName,
+                        grade: sD.grade,
+                        its: sD.its,
+                        present: presentStatus
+                    }
+                    studentsList.push(sData)
+                } catch (err) {
+                    throw err;
+                } finally {
+                    index += 1
+                    if(index == snapshot.size) {
+                        resolve();
+                    }
+                }
+            })
+        }))
 
-            let presentStatus = null;
-
-            if(pres.exists) {
-                console.log("Found record");
-                present = pres.data().present
-            }
-            let sData = { 
-                fullName: sD.fullName,
-                grade: sD.grade,
-                its: sD.its,
-                present: presentStatus
-            }
-            studentsList.push(sData)
-        })
-        console.log(studentsList);
+        
         res.send(studentsList)
+        
     } catch (error) {
-        res.status("502").send("Unable to fetch data.");
+        res.status(502).send(error);
+    }
+})
+
+router.post("/staff/submitAttendance", attendanceAuth, async(req, res) => {
+    try{
+        req.body.attendanceList.forEach((r) => {
+            let date = new Date().toISOString().split("T")[0]
+            let searchKey = date + ":" + r.its
+            attendanceRecord = {
+                date : date,
+                its : r.its,
+                present : r.present,
+                reasonOfAbsence: r.reasonOfAbsence ? r.reasonOfAbsence : ""
+            }
+            Attendance(attendanceRecord, (err) => {
+                if(!err) {
+                    attendanceRef.doc(searchKey).set(attendanceRecord)
+                } else {
+                    throw err;
+                }
+            })
+        })
+
+        res.send("Updated attendance")
+    } catch (error) {
+        res.status(503).send(error)
     }
 })
 
