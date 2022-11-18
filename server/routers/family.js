@@ -48,7 +48,7 @@ router.post('/family/login', async(req, res) => {
         delete family.tokens;
         res.send({family, token})
     } catch (error) {
-        res.send({error})
+        res.send(error.toString())
     }
 })
 
@@ -62,7 +62,7 @@ router.post('/family/logout', familyAuth, async(req, res) => {
         })
         res.send()
     } catch(error) {
-        res.status(500).send(error)
+        res.status(500).send(error.toString())
     }
 })
 
@@ -75,7 +75,7 @@ router.post('/family/logoutAll', familyAuth, async(req, res) => {
 
         res.send("Logged out all.")
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send(error.toString())
     }
 })
 
