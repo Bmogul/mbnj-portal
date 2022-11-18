@@ -30,7 +30,7 @@ const jwt = require('jsonwebtoken')
 const admin = require('firebase-admin')
 
 const { auth } = require('firebase-admin');
-const {staffAuth, attendanceAuth} = require('../middleware/staffAuth');
+const {staffAuth, attendanceAuth, headMAuth, adminAuth} = require('../middleware/staffAuth');
 const { resolveRef } = require('ajv/dist/compile');
 
 findByCredentials = async(its, password) => {
@@ -215,5 +215,54 @@ router.post("/staff/submitAttendance", attendanceAuth, async(req, res) => {
         res.status(503).send(error)
     }
 })
+
+router.get("/dayAttendanceReport/:date", headMAuth, async(req, res) => {
+    try{
+        const date = req.params.date
+
+        let snapshot = await attendanceRef.where("date", "==", date).get()
+
+        if(snapshot.empty) {
+            throw new Error("No attendance records for day")
+        }
+
+        studentsList = []
+        let index = 0
+        await new Promise((resolve => { 
+            snapshot.forEach(async(s) => {
+                try {
+                    let sD = s.data()
+                    let its = sD.its
+                    let status = sD.present
+                    let student = await studentRef.doc(its).get();
+
+                    if(student.exists) {
+                        let studentRecord = { 
+                            its: its,
+                            name: student.data().fullName,
+                            status: status,
+                            reasonOfAbsence: sD.reasonOfAbsence ? sD.reasonOfAbsence : ""
+
+                        }
+                        studentsList.push(studentRecord)
+                    }
+                    
+                } catch (err) {
+                    throw err;
+                } finally {
+                    index += 1
+                    if(index == snapshot.size) {
+                        resolve();
+                    }
+                }
+            })
+        }))
+
+        res.send(studentsList)
+
+    } catch (error) {
+        res.send({error: error})
+    }
+} )
 
 module.exports = router;
