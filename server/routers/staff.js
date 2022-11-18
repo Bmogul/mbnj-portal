@@ -70,7 +70,7 @@ router.post('/staff/login', async(req, res) => {
         delete staff.tokens;
         res.send({staff, token})
     } catch (error) {
-        res.send({error})
+        res.send(error.toString())
     }
 })
 
@@ -84,7 +84,7 @@ router.post('/staff/logout', staffAuth, async(req, res) => {
         })
         res.send()
     } catch(error) {
-        res.status(500).send(error)
+        res.status(500).send(error.toString())
     }
 })
 
@@ -97,7 +97,7 @@ router.post('/staff/logoutAll', staffAuth, async(req, res) => {
 
         res.send("Logged out all.")
     } catch (error) {
-        res.status(500).send(error)
+        res.status(500).send(error.toString())
     }
 })
 
@@ -186,7 +186,7 @@ router.get("/staff/attendanceList", attendanceAuth, async(req, res) => {
         res.send(studentsList)
         
     } catch (error) {
-        res.status(502).send(error);
+        res.status(502).send(error.toString());
     }
 })
 
@@ -212,7 +212,7 @@ router.post("/staff/submitAttendance", attendanceAuth, async(req, res) => {
 
         res.send("Updated attendance")
     } catch (error) {
-        res.status(503).send(error)
+        res.status(503).send(error.toString())
     }
 })
 
@@ -261,7 +261,7 @@ router.get("/dayAttendanceReport/:date", headMAuth, async(req, res) => {
         res.send(studentsList)
 
     } catch (error) {
-        res.send({error: error})
+        res.send(error.toString())
     }
 })
 
