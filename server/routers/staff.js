@@ -263,6 +263,61 @@ router.get("/dayAttendanceReport/:date", headMAuth, async(req, res) => {
     } catch (error) {
         res.send({error: error})
     }
-} )
+})
+
+router.get("/studentAttendanceReport/:its", headMAuth, async(req, res) => {
+    try{
+        const its = req.params.its
+
+        let snapshot = await attendanceRef.where("its", "==", its).get()
+
+        if(snapshot.empty) {
+            throw new Error("No attendance records for its " + its)
+        }
+
+        let student = await studentRef.doc(its).get();
+        
+        let studentName = ""
+        if(student.exists) {
+            studentName = student.data().fullName
+        } else {
+            throw new Error("No student with its " + its)
+        }
+
+        recordsList = []
+        let index = 0
+        await new Promise((resolve => { 
+            snapshot.forEach(async(r) => {
+                try {
+                    let rD = r.data()
+                    let status = rD.present
+                    
+
+                    let studentRecord = { 
+                        its: its,
+                        name: studentName,
+                        status: status,
+                        reasonOfAbsence: rD.reasonOfAbsence ? rD.reasonOfAbsence : ""
+
+                    }
+                    recordsList.push(studentRecord)
+                    
+                } catch (err) {
+                    throw err;
+                } finally {
+                    index += 1
+                    if(index == snapshot.size) {
+                        resolve();
+                    }
+                }
+            })
+        }))
+
+        res.send(recordsList)
+
+    } catch (error) {
+        res.send(error.toString())
+    }
+})
 
 module.exports = router;
