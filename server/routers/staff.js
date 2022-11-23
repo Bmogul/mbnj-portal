@@ -382,4 +382,56 @@ router.get("/lunchReport", committeAuth, async(req, res) => {
     }
 })
 
+router.get("/gradeDayAttendanceReport", headMAuth, async(req, res) => {
+    try{
+        const grade = req.body.grade
+        const date = req.body.date
+
+        let snapshot = await attendanceRef.where("date", "==", date).get()
+
+        if(snapshot.empty) {
+            throw new Error("No attendance records for day")
+        }
+
+        studentsList = []
+        let index = 0
+        await new Promise((resolve => { 
+            snapshot.forEach(async(s) => {
+                try {
+                    let sD = s.data()
+                    let its = sD.its
+                    let status = sD.present
+                    let student = await studentRef.doc(its).get();
+
+                    if(student.exists) {
+                        if(student.data().grade === grade){
+                            let studentRecord = { 
+                                its: its,
+                                name: student.data().fullName,
+                                status: status,
+                                reasonOfAbsence: sD.reasonOfAbsence ? sD.reasonOfAbsence : ""
+
+                            }
+                            studentsList.push(studentRecord)
+                        }
+                    }
+                    
+                } catch (err) {
+                    throw err;
+                } finally {
+                    index += 1
+                    if(index == snapshot.size) {
+                        resolve();
+                    }
+                }
+            })
+        }))
+
+        res.send(studentsList)
+
+    } catch (error) {
+        res.send(error.toString())
+    }
+})
+
 module.exports = router;
