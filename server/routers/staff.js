@@ -30,7 +30,7 @@ const jwt = require('jsonwebtoken')
 const admin = require('firebase-admin')
 
 const { auth } = require('firebase-admin');
-const {staffAuth, attendanceAuth, headMAuth, adminAuth} = require('../middleware/staffAuth');
+const {staffAuth, attendanceAuth, headMAuth, adminAuth, committeAuth} = require('../middleware/staffAuth');
 const { resolveRef } = require('ajv/dist/compile');
 
 findByCredentials = async(its, password) => {
@@ -216,9 +216,9 @@ router.post("/staff/submitAttendance", attendanceAuth, async(req, res) => {
     }
 })
 
-router.get("/dayAttendanceReport/:date", headMAuth, async(req, res) => {
+router.get("/dayAttendanceReport", headMAuth, async(req, res) => {
     try{
-        const date = req.params.date
+        const date = req.body.date
 
         let snapshot = await attendanceRef.where("date", "==", date).get()
 
@@ -265,9 +265,9 @@ router.get("/dayAttendanceReport/:date", headMAuth, async(req, res) => {
     }
 })
 
-router.get("/studentAttendanceReport/:its", headMAuth, async(req, res) => {
+router.get("/studentAttendanceReport", headMAuth, async(req, res) => {
     try{
-        const its = req.params.its
+        const its = req.body.its
 
         let snapshot = await attendanceRef.where("its", "==", its).get()
 
@@ -296,6 +296,7 @@ router.get("/studentAttendanceReport/:its", headMAuth, async(req, res) => {
                     let studentRecord = { 
                         its: its,
                         name: studentName,
+                        date: rD.date,
                         status: status,
                         reasonOfAbsence: rD.reasonOfAbsence ? rD.reasonOfAbsence : ""
 
@@ -314,6 +315,67 @@ router.get("/studentAttendanceReport/:its", headMAuth, async(req, res) => {
         }))
 
         res.send(recordsList)
+
+    } catch (error) {
+        res.send(error.toString())
+    }
+})
+
+router.get("/lunchReport", committeAuth, async(req, res) => {
+    try{
+        // let date = new Date().toISOString().split("T")[0]
+        let date = req.body.date;
+
+        let snapshot = await attendanceRef.where("date", "==", date).get()
+
+        if(snapshot.empty) {
+            throw new Error("No attendance records for day")
+        }
+
+        gradeCounts = {
+            'P': 0,
+            'K': 0,
+            '1': 0,
+            '2': 0,
+            '3': 0,
+            '4': 0,
+            '5': 0,
+            '6': 0,
+            '7': 0,
+            '8': 0,
+            '9': 0,
+            '10': 0
+        }
+        let index = 0
+        await new Promise((resolve => { 
+            snapshot.forEach(async(s) => {
+                try {
+                    let sD = s.data()
+                    let its = sD.its
+                    let student = await studentRef.doc(its).get();
+
+                    if(student.exists) {
+                        let grade= student.data().gradeNum[0];
+                        gradeCounts[grade]++;
+                    }
+                    
+                } catch (err) {
+                    throw err;
+                } finally {
+                    index += 1
+                    if(index == snapshot.size) {
+                        resolve();
+                    }
+                }
+            })
+        }))
+
+        gradeCounts["PreK"] = gradeCounts.P;
+        gradeCounts["KG"] = gradeCounts.K;
+        delete gradeCounts.P;
+        delete gradeCounts.K
+
+        res.send(gradeCounts)
 
     } catch (error) {
         res.send(error.toString())
