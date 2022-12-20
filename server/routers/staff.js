@@ -190,7 +190,7 @@ router.get("/staff/attendanceList", attendanceAuth, async(req, res) => {
     }
 })
 
-router.get("/staff/attendanceListAll", adminAuth, async(req, res) => {
+router.get("/staff/attendanceListAll", headMAuth, async(req, res) => {
     try {
         let attendanceStudentsRef = studentRef.where("status", "==", "Active");
         let snapshot = await attendanceStudentsRef.get();
@@ -247,6 +247,7 @@ router.post("/staff/submitAttendance", attendanceAuth, async(req, res) => {
                 date : date,
                 its : r.its,
                 present : r.present,
+                informed: r.informed ? r.informed : "",
                 reasonOfAbsence: r.reasonOfAbsence ? r.reasonOfAbsence : ""
             }
             Attendance(attendanceRecord, (err) => {
@@ -379,7 +380,7 @@ router.get("/lunchReport", committeAuth, async(req, res) => {
         if(snapshot.empty) {
             throw new Error("No attendance records for day")
         }
-
+        allergies = []
         gradeCounts = {
             'P': {
                 count: 0,
@@ -460,6 +461,12 @@ router.get("/lunchReport", committeAuth, async(req, res) => {
                             } else {
                                 gradeCounts[grade].female++;
                             }
+                            if(student.data().allergies != "None") {
+                                allergies.push({
+                                    name: student.data().name,
+                                    allergies: student.data().allergies
+                                })
+                            }
                         }
                     }
                     
@@ -478,6 +485,7 @@ router.get("/lunchReport", committeAuth, async(req, res) => {
         gradeCounts["KG"] = gradeCounts.K;
         delete gradeCounts.P;
         delete gradeCounts.K
+        gradeCounts.allergies = allergies
 
         res.send(gradeCounts)
 
