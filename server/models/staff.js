@@ -67,40 +67,7 @@ const staffSchema = {
         classes: {
             type: "array",
             items: {
-                type: "object",
-                properties: {
-                    period: {
-                        type: "string"
-                    },
-                    class: {
-                        type: "object",
-                        properties: {
-                            id: {
-                                type: "string"
-                            },
-                            name: {
-                                type: "string"
-                            },
-                            teachers: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    properties: {
-                                        name: {
-                                            type: "string"
-                                        },
-                                        phone: {
-                                            type: "string",
-                                            format: "phone"
-                                        }
-                                    },
-                                    required: ["name", "phone"]
-                                }
-                            }
-                        },
-                        required: ["id", "name", "teachers"]
-                    }
-                }
+                type: "object"
             }
             
         }
