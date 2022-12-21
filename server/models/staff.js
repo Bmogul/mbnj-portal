@@ -65,209 +65,48 @@ const staffSchema = {
             required: ["id", "name", "teachers"]
         },
         classes: {
-            type: "object",
-            properties: {
-                Period1: {
-                    type: "object",
-                    properties: {
-                        id: {
-                            type: "string"
-                        },
-                        name: {
-                            type: "string"
-                        },
-                        teachers: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                properties: {
-                                    name: {
-                                        type: "string"
-                                    },
-                                    phone: {
-                                        type: "string",
-                                        format: "phone"
-                                    }
-                                },
-                                required: ["name", "phone"]
-                            }
-                        }
+            type: "array",
+            items: {
+                type: "object",
+                properties: {
+                    period: {
+                        type: "string"
                     },
-                    required: ["id", "name", "teachers"]
-                },
-                Period2: {
-                    type: "object",
-                    properties: {
-                        id: {
-                            type: "string"
-                        },
-                        name: {
-                            type: "string"
-                        },
-                        teachers: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                properties: {
-                                    name: {
-                                        type: "string"
+                    class: {
+                        type: "object",
+                        properties: {
+                            id: {
+                                type: "string"
+                            },
+                            name: {
+                                type: "string"
+                            },
+                            teachers: {
+                                type: "array",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        name: {
+                                            type: "string"
+                                        },
+                                        phone: {
+                                            type: "string",
+                                            format: "phone"
+                                        }
                                     },
-                                    phone: {
-                                        type: "string",
-                                        format: "phone"
-                                    }
-                                },
-                                required: ["name", "phone"]
+                                    required: ["name", "phone"]
+                                }
                             }
-                        }
-                    },
-                    required: ["id", "name", "teachers"]
-                },
-                Period3: {
-                    type: "object",
-                    properties: {
-                        id: {
-                            type: "string"
                         },
-                        name: {
-                            type: "string"
-                        },
-                        teachers: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                properties: {
-                                    name: {
-                                        type: "string"
-                                    },
-                                    phone: {
-                                        type: "string",
-                                        format: "phone"
-                                    }
-                                },
-                                required: ["name", "phone"]
-                            }
-                        }
-                    },
-                    required: ["id", "name", "teachers"]
-                },
-                Period4: {
-                    type: "object",
-                    properties: {
-                        id: {
-                            type: "string"
-                        },
-                        name: {
-                            type: "string"
-                        },
-                        teachers: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                properties: {
-                                    name: {
-                                        type: "string"
-                                    },
-                                    phone: {
-                                        type: "string",
-                                        format: "phone"
-                                    }
-                                },
-                                required: ["name", "phone"]
-                            }
-                        }
-                    },
-                    required: ["id", "name", "teachers"]
-                },
-                Period5: {
-                    type: "object",
-                    properties: {
-                        id: {
-                            type: "string"
-                        },
-                        name: {
-                            type: "string"
-                        },
-                        teachers: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                properties: {
-                                    name: {
-                                        type: "string"
-                                    },
-                                    phone: {
-                                        type: "string",
-                                        format: "phone"
-                                    }
-                                },
-                                required: ["name", "phone"]
-                            }
-                        }
-                    },
-                    required: ["id", "name", "teachers"]
-                },
-                Period6: {
-                    type: "object",
-                    properties: {
-                        id: {
-                            type: "string"
-                        },
-                        name: {
-                            type: "string"
-                        },
-                        teachers: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                properties: {
-                                    name: {
-                                        type: "string"
-                                    },
-                                    phone: {
-                                        type: "string",
-                                        format: "phone"
-                                    }
-                                },
-                                required: ["name", "phone"]
-                            }
-                        }
-                    },
-                    required: ["id", "name", "teachers"]
-                },
-                Period7: {
-                    type: "object",
-                    properties: {
-                        id: {
-                            type: "string"
-                        },
-                        name: {
-                            type: "string"
-                        },
-                        teachers: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                properties: {
-                                    name: {
-                                        type: "string"
-                                    },
-                                    phone: {
-                                        type: "string",
-                                        format: "phone"
-                                    }
-                                },
-                                required: ["name", "phone"]
-                            }
-                        }
-                    },
-                    required: ["id", "name", "teachers"]
+                        required: ["id", "name", "teachers"]
+                    }
                 }
             }
+            
         }
 
     },
-    required: ["its", "name", "phone", "role", "password", "classes"],
+    required: ["its", "name", "role", "password"],
     additionalProperties: false
 }
 

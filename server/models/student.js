@@ -53,6 +53,15 @@ const studentSchema = {
         booksCollected: {
             type: "boolean"
         },
+        hifzMakan: {
+            type: "string"
+        },
+        surat: {
+            type: "string"
+        },
+        ayah: {
+            type: "string"
+        },
         status: {
             type: "string"
         },
