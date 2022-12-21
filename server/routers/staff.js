@@ -190,6 +190,54 @@ router.get("/staff/attendanceList", attendanceAuth, async(req, res) => {
     }
 })
 
+router.get("/staff/attendanceListAll", headMAuth, async(req, res) => {
+    try {
+        let attendanceStudentsRef = studentRef.where("status", "==", "Active");
+        let snapshot = await attendanceStudentsRef.get();
+        if(snapshot.empty) {
+            throw new Error("No active students");
+        }
+
+        studentsList = []
+        let index = 0
+        await new Promise((resolve => { 
+            snapshot.forEach(async(s) => {
+                try {
+                    let sD = s.data()
+                    let date = new Date().toISOString().split("T")[0]
+                    let searchKey = date + ":" + sD.its
+                    let pres = await attendanceRef.doc(searchKey).get();
+                    let presentStatus = null;
+
+                    if(pres.exists) {
+                        presentStatus = pres.data().present
+                    }
+                    let sData = { 
+                        fullName: sD.fullName,
+                        grade: sD.grade,
+                        its: sD.its,
+                        present: presentStatus
+                    }
+                    studentsList.push(sData)
+                } catch (err) {
+                    throw err;
+                } finally {
+                    index += 1
+                    if(index == snapshot.size) {
+                        resolve();
+                    }
+                }
+            })
+        }))
+
+        
+        res.send(studentsList)
+        
+    } catch (error) {
+        res.status(502).send(error.toString());
+    }
+})
+
 router.post("/staff/submitAttendance", attendanceAuth, async(req, res) => {
     try{
         req.body.attendanceList.forEach((r) => {
@@ -199,6 +247,7 @@ router.post("/staff/submitAttendance", attendanceAuth, async(req, res) => {
                 date : date,
                 its : r.its,
                 present : r.present,
+                informed: r.informed ? r.informed : "",
                 reasonOfAbsence: r.reasonOfAbsence ? r.reasonOfAbsence : ""
             }
             Attendance(attendanceRecord, (err) => {
@@ -331,32 +380,94 @@ router.get("/lunchReport", committeAuth, async(req, res) => {
         if(snapshot.empty) {
             throw new Error("No attendance records for day")
         }
-
+        allergies = []
         gradeCounts = {
-            'P': 0,
-            'K': 0,
-            '1': 0,
-            '2': 0,
-            '3': 0,
-            '4': 0,
-            '5': 0,
-            '6': 0,
-            '7': 0,
-            '8': 0,
-            '9': 0,
-            '10': 0
+            'P': {
+                count: 0,
+                male: 0,
+                female: 0
+            },
+            'K': {
+                count: 0,
+                male: 0,
+                female: 0
+            },
+            '1': {
+                count: 0,
+                male: 0,
+                female: 0
+            },
+            '2': {
+                count: 0,
+                male: 0,
+                female: 0
+            },
+            '3': {
+                count: 0,
+                male: 0,
+                female: 0
+            },
+            '4': {
+                count: 0,
+                male: 0,
+                female: 0
+            },
+            '5': {
+                count: 0,
+                male: 0,
+                female: 0
+            },
+            '6': {
+                count: 0,
+                male: 0,
+                female: 0
+            },
+            '7': {
+                count: 0,
+                male: 0,
+                female: 0
+            },
+            '8': {
+                count: 0,
+                male: 0,
+                female: 0
+            },
+            '9': {
+                count: 0,
+                male: 0,
+                female: 0
+            },
+            '10': {
+                count: 0,
+                male: 0,
+                female: 0
+            }
         }
         let index = 0
         await new Promise((resolve => { 
             snapshot.forEach(async(s) => {
                 try {
+                    
                     let sD = s.data()
                     let its = sD.its
-                    let student = await studentRef.doc(its).get();
+                    if(sD.present == "Late-In" || sD.present=="Present") {
+                        let student = await studentRef.doc(its).get();
 
-                    if(student.exists) {
-                        let grade= student.data().gradeNum[0];
-                        gradeCounts[grade]++;
+                        if(student.exists) {
+                            let grade= student.data().gradeNum[0];
+                            gradeCounts[grade].count++;
+                            if(student.data().gender == "Male") {
+                                gradeCounts[grade].male++;
+                            } else {
+                                gradeCounts[grade].female++;
+                            }
+                            if(student.data().allergies != "None") {
+                                allergies.push({
+                                    name: student.data().name,
+                                    allergies: student.data().allergies
+                                })
+                            }
+                        }
                     }
                     
                 } catch (err) {
@@ -374,6 +485,7 @@ router.get("/lunchReport", committeAuth, async(req, res) => {
         gradeCounts["KG"] = gradeCounts.K;
         delete gradeCounts.P;
         delete gradeCounts.K
+        gradeCounts.allergies = allergies
 
         res.send(gradeCounts)
 
@@ -434,4 +546,26 @@ router.get("/gradeDayAttendanceReport", headMAuth, async(req, res) => {
     }
 })
 
+
+router.get("/staff/getStudentProfile", headMAuth, async(req, res) => {
+    try{
+        let its = req.body.its;
+        let student = await studentRef.doc(its).get();
+        let studentData = {}
+
+        if(student.exists) {
+            studentData = student.data()
+            delete studentData.firstName
+            delete studentData.lastName
+            delete studentData.attendanceClass
+
+        } else {
+            res.send("No student found")
+        }
+
+        res.send(studentData)
+    } catch (error){
+        res.send(error.toString())
+    }
+})
 module.exports = router;

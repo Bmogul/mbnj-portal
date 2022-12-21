@@ -21,6 +21,10 @@ const attendanceSchema = {
             type: "string",
             enum: ["Present", "Absent", "Late-In", "Early-Out"]
         },
+        informed: {
+            type: "string",
+            enum: ["Informed", "Uninformed", ""]
+        },
         reasonOfAbsence: {
             type: "string"
         },
