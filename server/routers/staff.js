@@ -546,4 +546,26 @@ router.get("/gradeDayAttendanceReport", headMAuth, async(req, res) => {
     }
 })
 
+
+router.get("/staff/getStudentProfile", headMAuth, async(req, res) => {
+    try{
+        let its = req.body.its;
+        let student = await studentRef.doc(its).get();
+        let studentData = {}
+
+        if(student.exists) {
+            studentData = student.data()
+            delete studentData.firstName
+            delete studentData.lastName
+            delete studentData.attendanceClass
+
+        } else {
+            res.send("No student found")
+        }
+
+        res.send(studentData)
+    } catch (error){
+        res.send(error.toString())
+    }
+})
 module.exports = router;
