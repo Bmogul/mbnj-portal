@@ -32,6 +32,7 @@ const admin = require('firebase-admin')
 const { auth } = require('firebase-admin');
 const {staffAuth, attendanceAuth, headMAuth, adminAuth, committeAuth} = require('../middleware/staffAuth');
 const { resolveRef } = require('ajv/dist/compile');
+const { range } = require('lodash');
 
 findByCredentials = async(its, password) => {
     const staffDocRef = staffRef.where("its", "==", its)
@@ -44,7 +45,7 @@ findByCredentials = async(its, password) => {
             staffData = doc.data()
         });    
     }
-    const isMatch = bcyrpt.compare(password, staffData.password)
+    const isMatch = await bcyrpt.compare(password, staffData.password)
     if(!isMatch) {
         throw new Error("Unable to login")
     }
@@ -567,5 +568,48 @@ router.get("/staff/getStudentProfile", headMAuth, async(req, res) => {
     } catch (error){
         res.send(error.toString())
     }
+})
+
+router.get("/getTeacherAvailability", headMAuth, async(req, res) => {
+    try {
+        let availability = {}
+
+        let snapshot = await staffRef.where('role', 'array-contains-any', ['teacher', 'attendanceT', 'headM']).get()
+
+        if(snapshot.empty) {
+            throw new Error("No teachers found")
+        }
+
+        for(let i = 1; i <= 7; i++) {
+            availability[i] = {
+                'inClass': [],
+                'available': [],
+                'notAvailable': []
+            }
+        }
+
+        snapshot.forEach((s) => {
+            let sD = s.data()
+            let name = sD.name
+            let classes = sD.classes
+            classes.forEach((c) => {
+                let period = parseInt(c.period)
+                if(c.class.name === "Free") {
+                    availability[period].available.push(name)
+                } else if(c.class.name === "None") {
+                    availability[period].notAvailable.push(name)
+                } else {
+                    availability[period].inClass.push(name)
+                }
+            })
+
+        })
+
+        res.send(availability)
+    } catch (error) {
+        res.send(error.toString())
+    }
+
+
 })
 module.exports = router;

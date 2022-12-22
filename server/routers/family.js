@@ -22,7 +22,7 @@ findByCredentials = async(username, password) => {
             familyData = doc.data()
         });    
     }
-    const isMatch = bcyrpt.compare(password, familyData.password)
+    const isMatch = await bcyrpt.compare(password, familyData.password)
     if(!isMatch) {
         throw new Error("Unable to login")
     }
@@ -30,7 +30,7 @@ findByCredentials = async(username, password) => {
 }
 
 generateAuthToken = async(id) => {    
-    const token = jwt.sign({id: id}, process.env.CRYPT, { expiresIn: '1h' });
+    const token = jwt.sign({id: id}, process.env.CRYPT);
 
     const up = await familyRef.doc(id).update({
         tokens: admin.firestore.FieldValue.arrayUnion(token)
