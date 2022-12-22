@@ -23,6 +23,10 @@ const staffSchema = {
             type: "string",
             format: "phone"
         },
+        email: {
+            type: "string",
+            format: "email"
+        },
         role: {
             type: "array",
             items: {
