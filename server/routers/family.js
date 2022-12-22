@@ -22,7 +22,7 @@ findByCredentials = async(username, password) => {
             familyData = doc.data()
         });    
     }
-    const isMatch = bcyrpt.compare(password, familyData.password)
+    const isMatch = await bcyrpt.compare(password, familyData.password)
     if(!isMatch) {
         throw new Error("Unable to login")
     }
