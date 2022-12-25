@@ -239,6 +239,55 @@ router.get("/staff/attendanceListAll", headMAuth, async(req, res) => {
     }
 })
 
+router.get("/staff/attendanceListByClass", headMAuth, async(req, res) => {
+    try {
+        let classId = req.body.classId
+        let attendanceStudentsRef = studentRef.where("attendanceClass.id", "==", parseInt(classId));
+        let snapshot = await attendanceStudentsRef.get();
+        if(snapshot.empty) {
+            throw new Error("No active students");
+        }
+
+        studentsList = []
+        let index = 0
+        await new Promise((resolve => { 
+            snapshot.forEach(async(s) => {
+                try {
+                    let sD = s.data()
+                    let date = new Date().toISOString().split("T")[0]
+                    let searchKey = date + ":" + sD.its
+                    let pres = await attendanceRef.doc(searchKey).get();
+                    let presentStatus = null;
+
+                    if(pres.exists) {
+                        presentStatus = pres.data().present
+                    }
+                    let sData = { 
+                        fullName: sD.fullName,
+                        grade: sD.grade,
+                        its: sD.its,
+                        present: presentStatus
+                    }
+                    studentsList.push(sData)
+                } catch (err) {
+                    throw err;
+                } finally {
+                    index += 1
+                    if(index == snapshot.size) {
+                        resolve();
+                    }
+                }
+            })
+        }))
+
+        
+        res.send(studentsList)
+        
+    } catch (error) {
+        res.status(502).send(error.toString());
+    }
+})
+
 router.post("/staff/submitAttendance", attendanceAuth, async(req, res) => {
     try{
         req.body.attendanceList.forEach((r) => {
