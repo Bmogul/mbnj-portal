@@ -30,7 +30,7 @@ const jwt = require('jsonwebtoken')
 const admin = require('firebase-admin')
 
 const { auth } = require('firebase-admin');
-const {staffAuth, attendanceAuth, headMAuth, adminAuth, committeAuth} = require('../middleware/staffAuth');
+const {staffAuth, attendanceAuth, headMAuth, adminAuth, committeeAuth} = require('../middleware/staffAuth');
 const { resolveRef } = require('ajv/dist/compile');
 const { range } = require('lodash');
 
@@ -420,10 +420,13 @@ router.get("/studentAttendanceReport", headMAuth, async(req, res) => {
     }
 })
 
-router.get("/lunchReport", committeAuth, async(req, res) => {
+router.get("/lunchReport", committeeAuth, async(req, res) => {
     try{
         // let date = new Date().toISOString().split("T")[0]
         let date = req.body.date;
+        if(date == undefined) {
+            date = new Date().toISOString().split("T")[0]
+        }
 
         let snapshot = await attendanceRef.where("date", "==", date).get()
 

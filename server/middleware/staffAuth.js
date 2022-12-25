@@ -120,7 +120,7 @@ const adminAuth = async (req, res, next) => {
     }
 }
 
-const committeAuth = async (req, res, next) => {
+const committeeAuth = async (req, res, next) => {
     try{
         const token = req.header('Authorization').replace('Bearer ', '');
         const decoded = jwt.verify(token, process.env.CRYPT);
@@ -154,5 +154,5 @@ module.exports = {
     attendanceAuth: attendanceAuth,
     headMAuth: headMAuth,
     adminAuth: adminAuth,
-    committeAuth: committeAuth
+    committeeAuth: committeeAuth
 };
