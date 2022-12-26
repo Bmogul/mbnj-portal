@@ -11,7 +11,7 @@ const attendanceRef = db.collection('attendance');
 
 //Class
 const Class = require('../models/class');
-const classRef = db.collection('class');
+const classRef = db.collection('classes');
 
 //Grade
 const Grade = require('../models/grade');
@@ -25,12 +25,15 @@ const studentRef = db.collection('students');
 const StaffAttendance = require('../models/staffAttendance');
 const staffAttendanceRef = db.collection('staffAttendance');
 
+//Family
+const familyRef = db.collection('family');
+
 const bcyrpt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const admin = require('firebase-admin')
 
 const { auth } = require('firebase-admin');
-const {staffAuth, attendanceAuth, headMAuth, adminAuth, committeAuth} = require('../middleware/staffAuth');
+const {staffAuth, attendanceAuth, headMAuth, adminAuth, committeeAuth} = require('../middleware/staffAuth');
 const { resolveRef } = require('ajv/dist/compile');
 const { range } = require('lodash');
 
@@ -420,10 +423,13 @@ router.get("/studentAttendanceReport", headMAuth, async(req, res) => {
     }
 })
 
-router.get("/lunchReport", committeAuth, async(req, res) => {
+router.get("/lunchReport", committeeAuth, async(req, res) => {
     try{
         // let date = new Date().toISOString().split("T")[0]
         let date = req.body.date;
+        if(date == undefined) {
+            date = new Date().toISOString().split("T")[0]
+        }
 
         let snapshot = await attendanceRef.where("date", "==", date).get()
 
@@ -660,5 +666,44 @@ router.get("/getTeacherAvailability", headMAuth, async(req, res) => {
     }
 
 
+})
+
+router.post("/addStudent", headMAuth, async(req, res) => {
+    try {
+        let student = req.body.student
+
+        let familyId = student.family
+        let snapshot = await familyRef.doc(familyId).get()
+        if(snapshot.exists) {
+            let data = snapshot.data()
+            student.family = {
+                address: data.address,
+                id: data.id
+            }
+            student.parents = data.parents
+        } else {
+            throw new Error("Family does not exist")
+        }
+
+        let attendanceClassId = student.attendanceClass
+        snapshot = await classRef.doc(attendanceClassId).get()
+         if(snapshot.exists) {
+            let data = snapshot.data()
+            student.attendanceClass = data
+        } else {
+            throw new Error("Class does not exist")
+        }
+
+        Student(student, (err) => {
+            if(!err) {
+                studentRef.doc(student.its).set(student)
+            } else {
+                res.send(err.toString())
+            }
+        })
+        res.send("Student added.")
+    } catch (error) {
+        res.send(error.toString())
+    }
 })
 module.exports = router;
