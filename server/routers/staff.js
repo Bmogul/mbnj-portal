@@ -706,4 +706,78 @@ router.post("/addStudent", headMAuth, async(req, res) => {
         res.send(error.toString())
     }
 })
+
+router.get("/staff/staffAttendanceList", headMAuth, async(req, res) => {
+    try {
+        let attendanceStaffRef = staffRef.where('role', 'array-contains-any', ['teacher', 'attendanceT', 'headM']);
+        let snapshot = await attendanceStaffRef.get();
+        if(snapshot.empty) {
+            throw new Error("No teachers found");
+        }
+
+        staffList = []
+        let index = 0
+        await new Promise((resolve => { 
+            snapshot.forEach(async(s) => {
+                try {
+                    let sD = s.data()
+                    let date = new Date().toISOString().split("T")[0]
+                    let searchKey = date + ":" + sD.its
+                    let pres = await staffAttendanceRef.doc(searchKey).get();
+                    let presentStatus = null;
+
+                    if(pres.exists) {
+                        presentStatus = pres.data().present
+                    }
+                    let sData = { 
+                        fullName: sD.name,
+                        its: sD.its,
+                        present: presentStatus
+                    }
+                    staffList.push(sData)
+                } catch (err) {
+                    throw err;
+                } finally {
+                    index += 1
+                    if(index == snapshot.size) {
+                        resolve();
+                    }
+                }
+            })
+        }))
+
+        
+        res.send(staffList)
+        
+    } catch (error) {
+        res.status(502).send(error.toString());
+    }
+})
+
+router.post("/staff/submitStaffAttendance", headMAuth, async(req, res) => {
+    try{
+        req.body.attendanceList.forEach((r) => {
+            let date = new Date().toISOString().split("T")[0]
+            let searchKey = date + ":" + r.its
+            attendanceRecord = {
+                date : date,
+                its : r.its,
+                present : r.present,
+                informed: r.informed ? r.informed : "",
+                reasonOfAbsence: r.reasonOfAbsence ? r.reasonOfAbsence : ""
+            }
+            StaffAttendance(attendanceRecord, (err) => {
+                if(!err) {
+                    staffAttendanceRef.doc(searchKey).set(attendanceRecord)
+                } else {
+                    throw err;
+                }
+            })
+        })
+
+        res.send("Updated attendance")
+    } catch (error) {
+        res.status(503).send(error.toString())
+    }
+})
 module.exports = router;
