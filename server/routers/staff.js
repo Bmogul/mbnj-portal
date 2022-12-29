@@ -1,5 +1,6 @@
 const express = require('express');
 const router = new express.Router();
+const crypto = require('crypto')
 
 // Staff
 const Staff = require('../models/staff');
@@ -27,6 +28,8 @@ const staffAttendanceRef = db.collection('staffAttendance');
 
 //Family
 const familyRef = db.collection('family');
+
+const emailRef = db.collection('emails')
 
 const bcyrpt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
@@ -141,6 +144,72 @@ router.post("/staff/setup", async(req, res) => {
     } catch (error){
         res.status(401).send("Invalid Credentials");
     }
+})
+
+router.post("/staff/forgotPassword", async(req, res) => {
+    try {
+        let its = req.body.its
+
+        const snap = await staffRef.doc(its).get()
+
+        if(!snap.exists) {
+            throw new Error("Invalid its.")
+        }
+
+        let code = crypto.randomBytes(4).toString('hex')
+        let emailAddress = snap.data().email
+
+        await staffRef.doc(its).update({
+            password: await bcyrpt.hash(password, 8)
+        })
+
+        let email = {
+            to: emailAddress,
+            message: {
+                subject: "MBNJ portal password reset",
+                html: "Your OTP is <code>" + code + "</code>. To reset your password <a href='" + "'>Click Here</a>."
+            }
+        }
+
+        const status = await emailRef.add(email)
+
+        res.send("One time password sent.")
+
+    } catch (error) {
+        res.send(error.toString())
+    }
+})
+
+router.post("/staff/resetPassword", async(req, res) => {
+    try{
+        let otp = req.body.otp
+        let its = req.body.its
+        let newPassword = req.body.password
+
+        const snap = await staffRef.doc(its).get()
+
+        if(!snap.exists) {
+            res.send("Invalid its.")
+        }
+
+        let realOTP = snap.data().password
+
+        const isMatch = await bcyrpt.compare(otp, realOTP)
+        if(!isMatch) {
+            throw new Error("Incorrect OTP")
+        }
+
+        await staffRef.doc(its).update({
+            password: await bcyrpt.hash(newPassword, 8)
+        })
+
+        res.send("Password reset complete");
+    } catch(error) {
+        res.send(error.toString())
+    }
+
+    
+
 })
 
 router.get("/staff/attendanceList", attendanceAuth, async(req, res) => {
