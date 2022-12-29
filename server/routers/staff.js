@@ -208,8 +208,6 @@ router.post("/staff/resetPassword", async(req, res) => {
         res.send(error.toString())
     }
 
-    
-
 })
 
 router.get("/staff/attendanceList", attendanceAuth, async(req, res) => {
