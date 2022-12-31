@@ -6,5 +6,5 @@ if(!token){
     // uncomment code once done working on portal page
     document.location.href = './pages/login.html'
 }else{
-    document.location.href = './pages/portal.php'
+    document.location.href = './pages/portal.html'
 }

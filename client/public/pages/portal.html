@@ -34,10 +34,22 @@
         <div class="tab" id="tab-div">
         </div>
         <div id="tabs">
-            <?php 
-                include('DivCa.html');  // class Attendance
-            ?>
-            <?php
+        <!-- <div w3-include-html="DivCa.html"></div> -->
+
+        <!-- CLASS ATTENDANCE DIV -->
+    <div class="tabcontent" id="ClassAttendance">
+        <h1>Class Attendance</h1>
+        <select class="Attendance" name="class name" id="classesDropdown" onchange="loadClass(this)" title="Select Class" >
+            <option value="default">Select a class</option>
+        </select>
+        <button class="Attendance" onclick="markAllP()">Mark All Present</button>
+        <button class="Attendance" onclick="markAllA()">Mark All Absent</button>
+        <div id="studentsCA">
+        </div>
+        <button class="Attendance" type="submit" class="submitData" onclick="submitAttendanceRecord()">Submit</button>
+        <script src="../script/CAhandler.js"></script>
+    </div>
+            <!-- <?php
                 include('DivSl.html')   // student lookup
             ?>
             <?php
@@ -45,7 +57,7 @@
             ?>
             <?php
                 include('DivCh.html')   // class history
-            ?>
+            ?>  -->
         </div>
 
 

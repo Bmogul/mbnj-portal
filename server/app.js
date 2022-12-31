@@ -21,7 +21,7 @@ app.use(function(req,res,next){
     next()
 })
 console.log(__dirname)
-app.use(express.static('../client/public'));
+app.use(express.static(path.resolve()+'/client/public/'));
 app.use(express.json())
 // app.use(eventRouter)
 
@@ -35,9 +35,11 @@ app.use(staffAttendanceRouter)
 app.use(studentRouter)
 
 
-app.get('/', function(req,res){
-    res.sendFile(__dirname + '/../client/public/index.html')
-})
+// app.get('/', function(req,res){
+//     console.log('Hello, trying to sccess file');
+//     console.log(path.resolve()+'/client/public/index.html')
+//     res.sendFile(path.resolve()+'/client/public/')
+// })
 
 app.listen(port, () => {
     console.log("Listening on port 3001.");
