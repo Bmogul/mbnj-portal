@@ -1,5 +1,7 @@
 // import validator from 'validator'
 
+// const { stubString } = require("lodash");
+
 let token = sessionStorage.getItem('login_token')
 if(token){
     document.location.href = './portal.php'
@@ -30,7 +32,7 @@ const validate = ()=>{
             return false;
         }
     }
-    if(!psswd.value || psswd.value.length < 8 || !/[A-Z]/.test(psswd.value)){
+    if(!psswd.value || psswd.value.length < 8){
         alert('Please input a valid Password')
         return false;
     }
@@ -41,9 +43,27 @@ submit.onclick = () =>{
     // if valid inputs
     if(validate()){
         // check to see if in db and get login token
-        sessionStorage.setItem('login_token', 12804982);
-        return true;
+        validLogin = false;
+        fetch('/staff/login', {
+            method:'POST',
+            headers:{
+                'Content-Type': 'application/json',
+            },
+            body:JSON.stringify({its:uname.value,password:psswd.value})
+        }).then(status =>{
+            status.json().then(data => {   
+                console.log(data)
+                alert('allGOOD')
+                sessionStorage.setItem('login_token', data.token) 
+                validLogin = true; 
+        })}).catch(e =>{
+            console.log('ERROR', e)
+        })
+        console.log(validLogin)
+        alert('Logged in')
+        return false;
     }else{
+        alert("Invalid Login Credentials")
         return false;
     }
 }
