@@ -1,5 +1,6 @@
 const express = require('express');
 const router = new express.Router();
+const crypto = require('crypto')
 
 // Staff
 const Staff = require('../models/staff');
@@ -28,14 +29,24 @@ const staffAttendanceRef = db.collection('staffAttendance');
 //Family
 const familyRef = db.collection('family');
 
+const emailRef = db.collection('emails')
+
 const bcyrpt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const admin = require('firebase-admin')
 
-const { auth } = require('firebase-admin');
 const {staffAuth, attendanceAuth, headMAuth, adminAuth, committeeAuth} = require('../middleware/staffAuth');
 const { resolveRef } = require('ajv/dist/compile');
 const { range } = require('lodash');
+
+const { google } = require('googleapis')
+
+const auth = new google.auth.GoogleAuth({
+    keyFile: __dirname + "/../db/mbnjdb-service-account.json",
+    scopes: "https://www.googleapis.com/auth/spreadsheets"
+}) 
+
+
 
 findByCredentials = async(its, password) => {
     const staffDocRef = staffRef.where("its", "==", its)
@@ -50,7 +61,7 @@ findByCredentials = async(its, password) => {
     }
     const isMatch = await bcyrpt.compare(password, staffData.password)
     if(!isMatch) {
-        throw new Error("Unable to login")
+        throw new Error("Incorrect password")
     }
     return {"its": staffData.its, "data": staffData, "role": staffData.role}
 }
@@ -143,12 +154,90 @@ router.post("/staff/setup", async(req, res) => {
     }
 })
 
+router.post("/staff/forgotPassword", async(req, res) => {
+    try {
+        const authClientObject = await auth.getClient()
+
+        const googleSheetsInstance = google.sheets({ version: "v4", auth: authClientObject })
+        const spreadsheetId = process.env.SHEETID
+        let its = req.body.its
+
+        const snap = await staffRef.doc(its).get()
+
+        if(!snap.exists) {
+            throw new Error("Invalid its.")
+        }
+
+        let code = crypto.randomBytes(4).toString('hex')
+        let emailAddress = snap.data().email
+
+        await staffRef.doc(its).update({
+            password: await bcyrpt.hash(code, 8)
+        })
+
+        // let email = {
+        //     to: emailAddress,
+        //     message: {
+        //         subject: "MBNJ portal password reset",
+        //         html: "Your OTP is <code>" + code + "</code>. To reset your password <a href='" + "'>Click Here</a>."
+        //     }
+        // }
+
+        await googleSheetsInstance.spreadsheets.values.append({
+            auth,
+            spreadsheetId,
+            range: "Sheet1!A:B",
+            valueInputOption: "USER_ENTERED",
+            resource: {
+                values: [[emailAddress, code]]
+            }
+        })
+
+        // const status = await emailRef.add(email)
+
+        res.send("One time password sent.")
+
+    } catch (error) {
+        res.send(error.toString())
+    }
+})
+
+router.post("/staff/resetPassword", async(req, res) => {
+    try{
+        let otp = req.body.otp
+        let its = req.body.its
+        let newPassword = req.body.password
+
+        const snap = await staffRef.doc(its).get()
+
+        if(!snap.exists) {
+            res.send("Invalid its.")
+        }
+
+        let realOTP = snap.data().password
+
+        const isMatch = await bcyrpt.compare(otp, realOTP)
+        if(!isMatch) {
+            throw new Error("Incorrect OTP")
+        }
+
+        await staffRef.doc(its).update({
+            password: await bcyrpt.hash(newPassword, 8)
+        })
+
+        res.send("Password reset complete");
+    } catch(error) {
+        res.send(error.toString())
+    }
+
+})
+
 router.get("/staff/attendanceList", attendanceAuth, async(req, res) => {
     try {
 
         let attendanceID = req.staff.attendanceClass.id;
 
-        let attendanceStudentsRef = studentRef.where("attendanceClass.id", "==", parseInt(attendanceID));
+        let attendanceStudentsRef = studentRef.where("attendanceClass.id", "==", attendanceID);
         let snapshot = await attendanceStudentsRef.get();
         if(snapshot.empty) {
             throw new Error("No students in class");

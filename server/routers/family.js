@@ -117,4 +117,75 @@ router.post("/family/setup", async(req, res) => {
     }
 })
 
+router.post("/family/forgotPassword", async(req, res) => {
+    try {
+        let username = req.body.username
+
+        const snap = await familyRef.where("username", "==", username).get()
+
+        if(snap.empty) {
+            throw new Error("Invalid username.")
+        }
+        let familyID = ""
+        snap.forEach(doc => {
+            familyID = doc.data().id
+        });
+        let code = crypto.randomBytes(4).toString('hex')
+
+        await familyRef.doc(id).update({
+            password: await bcyrpt.hash(password, 8)
+        })
+
+        let email = {
+            to: username,
+            message: {
+                subject: "MBNJ portal password reset",
+                html: "Your OTP is <code>" + code + "</code>. To reset your password <a href='" + "'>Click Here</a>."
+            }
+        }
+
+        const status = await emailRef.add(email)
+
+        res.send("One time password sent.")
+
+    } catch (error) {
+        res.send(error.toString())
+    }
+})
+
+router.post("/family/resetPassword", async(req, res) => {
+    try{
+        let otp = req.body.otp
+        let username = req.body.username
+        let newPassword = req.body.password
+
+        const snap = await familyRef.where("username", "==", username).get()
+
+        if(snap.empty) {
+            throw new Error("Invalid username.")
+        }
+
+        let realOTP = ""
+        let familyID = ""
+        snap.forEach(doc => {
+            realOTP = doc.data().password
+            familyID = doc.data().id
+        });
+
+        const isMatch = await bcyrpt.compare(otp, realOTP)
+        if(!isMatch) {
+            throw new Error("Incorrect OTP")
+        }
+
+        await familyRef.doc(familyID).update({
+            password: await bcyrpt.hash(newPassword, 8)
+        })
+
+        res.send("Password reset complete");
+    } catch(error) {
+        res.send(error.toString())
+    }
+
+})
+
 module.exports = router;

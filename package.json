@@ -24,9 +24,11 @@
     "ajv-formats": "^2.1.1",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
+    "crypto": "^1.0.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.1",
     "firebase-admin": "^11.0.1",
+    "googleapis": "^110.0.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "validator": "^13.7.0"
