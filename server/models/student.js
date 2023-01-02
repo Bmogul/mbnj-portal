@@ -64,7 +64,6 @@ const studentSchema = {
         },
         status: {
             type: "string",
-            enum: ["Active", "Inactive"]
         },
         attendanceClass: {
             type: "object",
