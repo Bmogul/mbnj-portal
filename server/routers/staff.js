@@ -869,4 +869,53 @@ router.post("/staff/submitStaffAttendance", headMAuth, async(req, res) => {
         res.status(503).send(error.toString())
     }
 })
+
+router.get("/staffAttendanceReport", headMAuth, async(req, res) => {
+    try{
+        const date = req.body.date
+
+        let snapshot = await staffAttendanceRef.where("date", "==", date).get()
+
+        if(snapshot.empty) {
+            throw new Error("No staff attendance records for day")
+        }
+
+        staffList = []
+        let index = 0
+        await new Promise((resolve => { 
+            snapshot.forEach(async(s) => {
+                try {
+                    let sD = s.data()
+                    let its = sD.its
+                    let status = sD.present
+                    let staff = await staffRef.doc(its).get();
+
+                    if(staff.exists) {
+                        let staffRecord = { 
+                            its: its,
+                            name: staff.data().name,
+                            status: status,
+                            reasonOfAbsence: sD.reasonOfAbsence ? sD.reasonOfAbsence : ""
+                        }
+                        staffList.push(staffRecord)
+                    }
+                    
+                } catch (err) {
+                    throw err;
+                } finally {
+                    index += 1
+                    if(index == snapshot.size) {
+                        resolve();
+                    }
+                }
+            })
+        }))
+
+        res.send(staffList)
+
+    } catch (error) {
+        res.send(error.toString())
+    }
+})
+
 module.exports = router;
