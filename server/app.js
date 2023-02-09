@@ -41,6 +41,18 @@ app.get('/', function(req,res){
     res.sendFile(path.resolve(cPath))
 })
 
+app.get('/login', function(req,res){
+    let cPath = './client/public/pages/login.html'
+    console.log(path.resolve(cPath))
+    res.sendFile(path.resolve(cPath))
+})
+
+app.get('/parentLogin', function(req,res){
+    let cPath = './client/public/pages/parentlogin.html'
+    console.log(path.resolve(cPath))
+    res.sendFile(path.resolve(cPath))
+})
+
 app.listen(port, () => {
     console.log("Listening on port 3001.");
 })

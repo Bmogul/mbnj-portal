@@ -4,7 +4,7 @@
 
 let token = sessionStorage.getItem('login_token')
 if(token){
-    document.location.href = './portal.php'
+    document.location.href = './portal.html'
 }
 
 const loginForm = document.getElementById('loginForm');
