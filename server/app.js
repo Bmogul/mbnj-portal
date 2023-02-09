@@ -35,11 +35,11 @@ app.use(staffAttendanceRouter)
 app.use(studentRouter)
 
 
-// app.get('/', function(req,res){
-//     console.log('Hello, trying to sccess file');
-//     console.log(path.resolve()+'/client/public/index.html')
-//     res.sendFile(path.resolve()+'/client/public/')
-// })
+app.get('/', function(req,res){
+    let cPath = './client/public/pages/login.html'
+    console.log(path.resolve(cPath))
+    res.sendFile(path.resolve(cPath))
+})
 
 app.listen(port, () => {
     console.log("Listening on port 3001.");
