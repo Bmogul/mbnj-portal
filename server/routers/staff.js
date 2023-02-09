@@ -35,7 +35,7 @@ const bcyrpt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const admin = require('firebase-admin')
 
-const {staffAuth, attendanceAuth, headMAuth, adminAuth, committeeAuth} = require('../middleware/staffAuth');
+const { staffAuth, attendanceAuth, headMAuth, adminAuth, committeeAuth } = require('../middleware/staffAuth');
 const { resolveRef } = require('ajv/dist/compile');
 const { range } = require('lodash');
 
@@ -44,30 +44,30 @@ const { google } = require('googleapis')
 const auth = new google.auth.GoogleAuth({
     keyFile: __dirname + "/../db/mbnjdb-service-account.json",
     scopes: "https://www.googleapis.com/auth/spreadsheets"
-}) 
+})
 
 
 
-findByCredentials = async(its, password) => {
+findByCredentials = async (its, password) => {
     const staffDocRef = staffRef.where("its", "==", its)
     staffData = ""
     const snap = await staffDocRef.get()
-    if(snap.empty) {
+    if (snap.empty) {
         throw new Error('Unable to login')
     } else {
         snap.forEach(doc => {
             staffData = doc.data()
-        });    
+        });
     }
     const isMatch = await bcyrpt.compare(password, staffData.password)
-    if(!isMatch) {
+    if (!isMatch) {
         throw new Error("Incorrect password")
     }
-    return {"its": staffData.its, "data": staffData, "role": staffData.role}
+    return { "its": staffData.its, "data": staffData, "role": staffData.role }
 }
 
-generateAuthToken = async(its, role) => {    
-    const token = jwt.sign({its: its, role: role}, process.env.CRYPT);
+generateAuthToken = async (its, role) => {
+    const token = jwt.sign({ its: its, role: role }, process.env.CRYPT);
 
     const up = await staffRef.doc(its).update({
         tokens: admin.firestore.FieldValue.arrayUnion(token)
@@ -76,20 +76,28 @@ generateAuthToken = async(its, role) => {
     return token;
 }
 
-router.post('/staff/login', async(req, res) => {
+router.post('/staff/login', async (req, res) => {
     try {
+        if (!req.body.its || !/^[0-9]{8}$/.test(req.body.its)) {
+            // alert('Please input a valid ITS')
+            throw new Error("Please input a valid ITS") 
+        }
+        if (!req.body.password) {
+            // alert('Please input a valid Password')
+            throw new Error("Please input a valid Password") 
+        }
         const staffObj = await findByCredentials(req.body.its, req.body.password)
         const token = await generateAuthToken(staffObj.its, staffObj.role)
         const staff = staffObj.data
         delete staff.password;
         delete staff.tokens;
-        res.send({staff, token})
+        res.send({ staff, token })
     } catch (error) {
         res.send(error.toString())
     }
 })
 
-router.post('/staff/logout', staffAuth, async(req, res) => {
+router.post('/staff/logout', staffAuth, async (req, res) => {
     try {
         req.staff.tokens = req.staff.tokens.filter(t => {
             return t != req.token
@@ -98,12 +106,12 @@ router.post('/staff/logout', staffAuth, async(req, res) => {
             tokens: req.staff.tokens
         })
         res.send()
-    } catch(error) {
+    } catch (error) {
         res.status(500).send(error.toString())
     }
 })
 
-router.post('/staff/logoutAll', staffAuth, async(req, res) => {
+router.post('/staff/logoutAll', staffAuth, async (req, res) => {
     try {
         req.staff.tokens = []
         await staffRef.doc(req.staff.its).update({
@@ -116,30 +124,30 @@ router.post('/staff/logoutAll', staffAuth, async(req, res) => {
     }
 })
 
-router.get("/staff/profile", staffAuth, async(req, res) => {
+router.get("/staff/profile", staffAuth, async (req, res) => {
     delete req.staff.password;
     delete req.staff.tokens;
     res.send(req.staff);
 })
 
-router.post("/staff/setup", async(req, res) => {
+router.post("/staff/setup", async (req, res) => {
     try {
         its = req.body.its;
         def_password = req.body.def_password;
         password = req.body.password;
-        if(def_password != process.env.DEFAULT_PASSWORD) {
+        if (def_password != process.env.DEFAULT_PASSWORD) {
             throw new Error("Incorrect password");
         }
 
         const staffDocRef = staffRef.where("its", "==", its)
         staffData = ""
         const snap = await staffDocRef.get()
-        if(snap.empty) {
+        if (snap.empty) {
             throw new Error('ITS not found')
         } else {
             snap.forEach(doc => {
                 staffData = doc.data()
-            });    
+            });
         }
 
         await staffRef.doc(staffData.its).update({
@@ -149,12 +157,12 @@ router.post("/staff/setup", async(req, res) => {
         res.send("Password setup complete");
 
 
-    } catch (error){
+    } catch (error) {
         res.status(401).send("Invalid Credentials");
     }
 })
 
-router.post("/staff/forgotPassword", async(req, res) => {
+router.post("/staff/forgotPassword", async (req, res) => {
     try {
         const authClientObject = await auth.getClient()
 
@@ -164,7 +172,7 @@ router.post("/staff/forgotPassword", async(req, res) => {
 
         const snap = await staffRef.doc(its).get()
 
-        if(!snap.exists) {
+        if (!snap.exists) {
             throw new Error("Invalid its.")
         }
 
@@ -202,22 +210,22 @@ router.post("/staff/forgotPassword", async(req, res) => {
     }
 })
 
-router.post("/staff/resetPassword", async(req, res) => {
-    try{
+router.post("/staff/resetPassword", async (req, res) => {
+    try {
         let otp = req.body.otp
         let its = req.body.its
         let newPassword = req.body.password
 
         const snap = await staffRef.doc(its).get()
 
-        if(!snap.exists) {
+        if (!snap.exists) {
             res.send("Invalid its.")
         }
 
         let realOTP = snap.data().password
 
         const isMatch = await bcyrpt.compare(otp, realOTP)
-        if(!isMatch) {
+        if (!isMatch) {
             throw new Error("Incorrect OTP")
         }
 
@@ -226,27 +234,27 @@ router.post("/staff/resetPassword", async(req, res) => {
         })
 
         res.send("Password reset complete");
-    } catch(error) {
+    } catch (error) {
         res.send(error.toString())
     }
 
 })
 
-router.get("/staff/attendanceList", attendanceAuth, async(req, res) => {
+router.get("/staff/attendanceList", attendanceAuth, async (req, res) => {
     try {
 
         let attendanceID = req.staff.attendanceClass.id;
 
         let attendanceStudentsRef = studentRef.where("attendanceClass.id", "==", attendanceID);
         let snapshot = await attendanceStudentsRef.get();
-        if(snapshot.empty) {
+        if (snapshot.empty) {
             throw new Error("No students in class");
         }
 
         studentsList = []
         let index = 0
-        await new Promise((resolve => { 
-            snapshot.forEach(async(s) => {
+        await new Promise((resolve => {
+            snapshot.forEach(async (s) => {
                 try {
                     let sD = s.data()
                     let date = new Date().toISOString().split("T")[0]
@@ -254,10 +262,10 @@ router.get("/staff/attendanceList", attendanceAuth, async(req, res) => {
                     let pres = await attendanceRef.doc(searchKey).get();
                     let presentStatus = null;
 
-                    if(pres.exists) {
+                    if (pres.exists) {
                         presentStatus = pres.data().present
                     }
-                    let sData = { 
+                    let sData = {
                         fullName: sD.fullName,
                         grade: sD.grade,
                         its: sD.its,
@@ -268,33 +276,33 @@ router.get("/staff/attendanceList", attendanceAuth, async(req, res) => {
                     throw err;
                 } finally {
                     index += 1
-                    if(index == snapshot.size) {
+                    if (index == snapshot.size) {
                         resolve();
                     }
                 }
             })
         }))
 
-        
+
         res.send(studentsList)
-        
+
     } catch (error) {
         res.status(502).send(error.toString());
     }
 })
 
-router.get("/staff/attendanceListAll", headMAuth, async(req, res) => {
+router.get("/staff/attendanceListAll", headMAuth, async (req, res) => {
     try {
         let attendanceStudentsRef = studentRef.where("status", "==", "Active");
         let snapshot = await attendanceStudentsRef.get();
-        if(snapshot.empty) {
+        if (snapshot.empty) {
             throw new Error("No active students");
         }
 
         studentsList = []
         let index = 0
-        await new Promise((resolve => { 
-            snapshot.forEach(async(s) => {
+        await new Promise((resolve => {
+            snapshot.forEach(async (s) => {
                 try {
                     let sD = s.data()
                     let date = new Date().toISOString().split("T")[0]
@@ -302,10 +310,10 @@ router.get("/staff/attendanceListAll", headMAuth, async(req, res) => {
                     let pres = await attendanceRef.doc(searchKey).get();
                     let presentStatus = null;
 
-                    if(pres.exists) {
+                    if (pres.exists) {
                         presentStatus = pres.data().present
                     }
-                    let sData = { 
+                    let sData = {
                         fullName: sD.fullName,
                         grade: sD.grade,
                         its: sD.its,
@@ -316,34 +324,34 @@ router.get("/staff/attendanceListAll", headMAuth, async(req, res) => {
                     throw err;
                 } finally {
                     index += 1
-                    if(index == snapshot.size) {
+                    if (index == snapshot.size) {
                         resolve();
                     }
                 }
             })
         }))
 
-        
+
         res.send(studentsList)
-        
+
     } catch (error) {
         res.status(502).send(error.toString());
     }
 })
 
-router.get("/staff/attendanceListByClass", headMAuth, async(req, res) => {
+router.get("/staff/attendanceListByClass", headMAuth, async (req, res) => {
     try {
         let classId = req.body.classId
         let attendanceStudentsRef = studentRef.where("attendanceClass.id", "==", parseInt(classId));
         let snapshot = await attendanceStudentsRef.get();
-        if(snapshot.empty) {
+        if (snapshot.empty) {
             throw new Error("No active students");
         }
 
         studentsList = []
         let index = 0
-        await new Promise((resolve => { 
-            snapshot.forEach(async(s) => {
+        await new Promise((resolve => {
+            snapshot.forEach(async (s) => {
                 try {
                     let sD = s.data()
                     let date = new Date().toISOString().split("T")[0]
@@ -351,10 +359,10 @@ router.get("/staff/attendanceListByClass", headMAuth, async(req, res) => {
                     let pres = await attendanceRef.doc(searchKey).get();
                     let presentStatus = null;
 
-                    if(pres.exists) {
+                    if (pres.exists) {
                         presentStatus = pres.data().present
                     }
-                    let sData = { 
+                    let sData = {
                         fullName: sD.fullName,
                         grade: sD.grade,
                         its: sD.its,
@@ -365,35 +373,35 @@ router.get("/staff/attendanceListByClass", headMAuth, async(req, res) => {
                     throw err;
                 } finally {
                     index += 1
-                    if(index == snapshot.size) {
+                    if (index == snapshot.size) {
                         resolve();
                     }
                 }
             })
         }))
 
-        
+
         res.send(studentsList)
-        
+
     } catch (error) {
         res.status(502).send(error.toString());
     }
 })
 
-router.post("/staff/submitAttendance", attendanceAuth, async(req, res) => {
-    try{
+router.post("/staff/submitAttendance", attendanceAuth, async (req, res) => {
+    try {
         req.body.attendanceList.forEach((r) => {
             let date = new Date().toISOString().split("T")[0]
             let searchKey = date + ":" + r.its
             attendanceRecord = {
-                date : date,
-                its : r.its,
-                present : r.present,
+                date: date,
+                its: r.its,
+                present: r.present,
                 informed: r.informed ? r.informed : "",
                 reasonOfAbsence: r.reasonOfAbsence ? r.reasonOfAbsence : ""
             }
             Attendance(attendanceRecord, (err) => {
-                if(!err) {
+                if (!err) {
                     attendanceRef.doc(searchKey).set(attendanceRecord)
                 } else {
                     throw err;
@@ -407,28 +415,28 @@ router.post("/staff/submitAttendance", attendanceAuth, async(req, res) => {
     }
 })
 
-router.get("/dayAttendanceReport", headMAuth, async(req, res) => {
-    try{
+router.get("/dayAttendanceReport", headMAuth, async (req, res) => {
+    try {
         const date = req.body.date
 
         let snapshot = await attendanceRef.where("date", "==", date).get()
 
-        if(snapshot.empty) {
+        if (snapshot.empty) {
             throw new Error("No attendance records for day")
         }
 
         studentsList = []
         let index = 0
-        await new Promise((resolve => { 
-            snapshot.forEach(async(s) => {
+        await new Promise((resolve => {
+            snapshot.forEach(async (s) => {
                 try {
                     let sD = s.data()
                     let its = sD.its
                     let status = sD.present
                     let student = await studentRef.doc(its).get();
 
-                    if(student.exists) {
-                        let studentRecord = { 
+                    if (student.exists) {
+                        let studentRecord = {
                             its: its,
                             name: student.data().fullName,
                             status: status,
@@ -437,12 +445,12 @@ router.get("/dayAttendanceReport", headMAuth, async(req, res) => {
                         }
                         studentsList.push(studentRecord)
                     }
-                    
+
                 } catch (err) {
                     throw err;
                 } finally {
                     index += 1
-                    if(index == snapshot.size) {
+                    if (index == snapshot.size) {
                         resolve();
                     }
                 }
@@ -456,20 +464,20 @@ router.get("/dayAttendanceReport", headMAuth, async(req, res) => {
     }
 })
 
-router.get("/studentAttendanceReport", headMAuth, async(req, res) => {
-    try{
+router.get("/studentAttendanceReport", headMAuth, async (req, res) => {
+    try {
         const its = req.body.its
 
         let snapshot = await attendanceRef.where("its", "==", its).get()
 
-        if(snapshot.empty) {
+        if (snapshot.empty) {
             throw new Error("No attendance records for its " + its)
         }
 
         let student = await studentRef.doc(its).get();
-        
+
         let studentName = ""
-        if(student.exists) {
+        if (student.exists) {
             studentName = student.data().fullName
         } else {
             throw new Error("No student with its " + its)
@@ -477,14 +485,14 @@ router.get("/studentAttendanceReport", headMAuth, async(req, res) => {
 
         recordsList = []
         let index = 0
-        await new Promise((resolve => { 
-            snapshot.forEach(async(r) => {
+        await new Promise((resolve => {
+            snapshot.forEach(async (r) => {
                 try {
                     let rD = r.data()
                     let status = rD.present
-                    
 
-                    let studentRecord = { 
+
+                    let studentRecord = {
                         its: its,
                         name: studentName,
                         date: rD.date,
@@ -493,12 +501,12 @@ router.get("/studentAttendanceReport", headMAuth, async(req, res) => {
 
                     }
                     recordsList.push(studentRecord)
-                    
+
                 } catch (err) {
                     throw err;
                 } finally {
                     index += 1
-                    if(index == snapshot.size) {
+                    if (index == snapshot.size) {
                         resolve();
                     }
                 }
@@ -512,17 +520,17 @@ router.get("/studentAttendanceReport", headMAuth, async(req, res) => {
     }
 })
 
-router.get("/lunchReport", committeeAuth, async(req, res) => {
-    try{
+router.get("/lunchReport", committeeAuth, async (req, res) => {
+    try {
         // let date = new Date().toISOString().split("T")[0]
         let date = req.body.date;
-        if(date == undefined) {
+        if (date == undefined) {
             date = new Date().toISOString().split("T")[0]
         }
 
         let snapshot = await attendanceRef.where("date", "==", date).get()
 
-        if(snapshot.empty) {
+        if (snapshot.empty) {
             throw new Error("No attendance records for day")
         }
         allergies = []
@@ -589,24 +597,24 @@ router.get("/lunchReport", committeeAuth, async(req, res) => {
             }
         }
         let index = 0
-        await new Promise((resolve => { 
-            snapshot.forEach(async(s) => {
+        await new Promise((resolve => {
+            snapshot.forEach(async (s) => {
                 try {
-                    
+
                     let sD = s.data()
                     let its = sD.its
-                    if(sD.present == "Late-In" || sD.present=="Present") {
+                    if (sD.present == "Late-In" || sD.present == "Present") {
                         let student = await studentRef.doc(its).get();
 
-                        if(student.exists) {
-                            let grade= student.data().gradeNum[0];
+                        if (student.exists) {
+                            let grade = student.data().gradeNum[0];
                             gradeCounts[grade].count++;
-                            if(student.data().gender == "Male") {
+                            if (student.data().gender == "Male") {
                                 gradeCounts[grade].male++;
                             } else {
                                 gradeCounts[grade].female++;
                             }
-                            if(student.data().allergies != "None") {
+                            if (student.data().allergies != "None") {
                                 allergies.push({
                                     name: student.data().name,
                                     allergies: student.data().allergies
@@ -614,12 +622,12 @@ router.get("/lunchReport", committeeAuth, async(req, res) => {
                             }
                         }
                     }
-                    
+
                 } catch (err) {
                     throw err;
                 } finally {
                     index += 1
-                    if(index == snapshot.size) {
+                    if (index == snapshot.size) {
                         resolve();
                     }
                 }
@@ -639,30 +647,30 @@ router.get("/lunchReport", committeeAuth, async(req, res) => {
     }
 })
 
-router.get("/gradeDayAttendanceReport", headMAuth, async(req, res) => {
-    try{
+router.get("/gradeDayAttendanceReport", headMAuth, async (req, res) => {
+    try {
         const grade = req.body.grade
         const date = req.body.date
 
         let snapshot = await attendanceRef.where("date", "==", date).get()
 
-        if(snapshot.empty) {
+        if (snapshot.empty) {
             throw new Error("No attendance records for day")
         }
 
         studentsList = []
         let index = 0
-        await new Promise((resolve => { 
-            snapshot.forEach(async(s) => {
+        await new Promise((resolve => {
+            snapshot.forEach(async (s) => {
                 try {
                     let sD = s.data()
                     let its = sD.its
                     let status = sD.present
                     let student = await studentRef.doc(its).get();
 
-                    if(student.exists) {
-                        if(student.data().grade === grade){
-                            let studentRecord = { 
+                    if (student.exists) {
+                        if (student.data().grade === grade) {
+                            let studentRecord = {
                                 its: its,
                                 name: student.data().fullName,
                                 status: status,
@@ -672,12 +680,12 @@ router.get("/gradeDayAttendanceReport", headMAuth, async(req, res) => {
                             studentsList.push(studentRecord)
                         }
                     }
-                    
+
                 } catch (err) {
                     throw err;
                 } finally {
                     index += 1
-                    if(index == snapshot.size) {
+                    if (index == snapshot.size) {
                         resolve();
                     }
                 }
@@ -692,13 +700,13 @@ router.get("/gradeDayAttendanceReport", headMAuth, async(req, res) => {
 })
 
 
-router.get("/staff/getStudentProfile", headMAuth, async(req, res) => {
-    try{
+router.get("/staff/getStudentProfile", headMAuth, async (req, res) => {
+    try {
         let its = req.body.its;
         let student = await studentRef.doc(its).get();
         let studentData = {}
 
-        if(student.exists) {
+        if (student.exists) {
             studentData = student.data()
             delete studentData.firstName
             delete studentData.lastName
@@ -709,22 +717,22 @@ router.get("/staff/getStudentProfile", headMAuth, async(req, res) => {
         }
 
         res.send(studentData)
-    } catch (error){
+    } catch (error) {
         res.send(error.toString())
     }
 })
 
-router.get("/getTeacherAvailability", headMAuth, async(req, res) => {
+router.get("/getTeacherAvailability", headMAuth, async (req, res) => {
     try {
         let availability = {}
 
         let snapshot = await staffRef.where('role', 'array-contains-any', ['teacher', 'attendanceT', 'headM']).get()
 
-        if(snapshot.empty) {
+        if (snapshot.empty) {
             throw new Error("No teachers found")
         }
 
-        for(let i = 1; i <= 7; i++) {
+        for (let i = 1; i <= 7; i++) {
             availability[i] = {
                 'inClass': [],
                 'available': [],
@@ -738,9 +746,9 @@ router.get("/getTeacherAvailability", headMAuth, async(req, res) => {
             let classes = sD.classes
             classes.forEach((c) => {
                 let period = parseInt(c.period)
-                if(c.class.name === "Free") {
+                if (c.class.name === "Free") {
                     availability[period].available.push(name)
-                } else if(c.class.name === "None") {
+                } else if (c.class.name === "None") {
                     availability[period].notAvailable.push(name)
                 } else {
                     availability[period].inClass.push(name)
@@ -757,13 +765,13 @@ router.get("/getTeacherAvailability", headMAuth, async(req, res) => {
 
 })
 
-router.post("/addStudent", headMAuth, async(req, res) => {
+router.post("/addStudent", headMAuth, async (req, res) => {
     try {
         let student = req.body.student
 
         let familyId = student.family
         let snapshot = await familyRef.doc(familyId).get()
-        if(snapshot.exists) {
+        if (snapshot.exists) {
             let data = snapshot.data()
             student.family = {
                 address: data.address,
@@ -776,7 +784,7 @@ router.post("/addStudent", headMAuth, async(req, res) => {
 
         let attendanceClassId = student.attendanceClass
         snapshot = await classRef.doc(attendanceClassId).get()
-         if(snapshot.exists) {
+        if (snapshot.exists) {
             let data = snapshot.data()
             student.attendanceClass = data
         } else {
@@ -784,7 +792,7 @@ router.post("/addStudent", headMAuth, async(req, res) => {
         }
 
         Student(student, (err) => {
-            if(!err) {
+            if (!err) {
                 studentRef.doc(student.its).set(student)
             } else {
                 res.send(err.toString())
@@ -796,18 +804,18 @@ router.post("/addStudent", headMAuth, async(req, res) => {
     }
 })
 
-router.get("/staff/staffAttendanceList", headMAuth, async(req, res) => {
+router.get("/staff/staffAttendanceList", headMAuth, async (req, res) => {
     try {
         let attendanceStaffRef = staffRef.where('role', 'array-contains-any', ['teacher', 'attendanceT', 'headM']);
         let snapshot = await attendanceStaffRef.get();
-        if(snapshot.empty) {
+        if (snapshot.empty) {
             throw new Error("No teachers found");
         }
 
         staffList = []
         let index = 0
-        await new Promise((resolve => { 
-            snapshot.forEach(async(s) => {
+        await new Promise((resolve => {
+            snapshot.forEach(async (s) => {
                 try {
                     let sD = s.data()
                     let date = new Date().toISOString().split("T")[0]
@@ -815,10 +823,10 @@ router.get("/staff/staffAttendanceList", headMAuth, async(req, res) => {
                     let pres = await staffAttendanceRef.doc(searchKey).get();
                     let presentStatus = null;
 
-                    if(pres.exists) {
+                    if (pres.exists) {
                         presentStatus = pres.data().present
                     }
-                    let sData = { 
+                    let sData = {
                         fullName: sD.name,
                         its: sD.its,
                         present: presentStatus
@@ -828,35 +836,35 @@ router.get("/staff/staffAttendanceList", headMAuth, async(req, res) => {
                     throw err;
                 } finally {
                     index += 1
-                    if(index == snapshot.size) {
+                    if (index == snapshot.size) {
                         resolve();
                     }
                 }
             })
         }))
 
-        
+
         res.send(staffList)
-        
+
     } catch (error) {
         res.status(502).send(error.toString());
     }
 })
 
-router.post("/staff/submitStaffAttendance", headMAuth, async(req, res) => {
-    try{
+router.post("/staff/submitStaffAttendance", headMAuth, async (req, res) => {
+    try {
         req.body.attendanceList.forEach((r) => {
             let date = new Date().toISOString().split("T")[0]
             let searchKey = date + ":" + r.its
             attendanceRecord = {
-                date : date,
-                its : r.its,
-                present : r.present,
+                date: date,
+                its: r.its,
+                present: r.present,
                 informed: r.informed ? r.informed : "",
                 reasonOfAbsence: r.reasonOfAbsence ? r.reasonOfAbsence : ""
             }
             StaffAttendance(attendanceRecord, (err) => {
-                if(!err) {
+                if (!err) {
                     staffAttendanceRef.doc(searchKey).set(attendanceRecord)
                 } else {
                     throw err;
@@ -870,28 +878,28 @@ router.post("/staff/submitStaffAttendance", headMAuth, async(req, res) => {
     }
 })
 
-router.get("/staffAttendanceReport", headMAuth, async(req, res) => {
-    try{
+router.get("/staffAttendanceReport", headMAuth, async (req, res) => {
+    try {
         const date = req.body.date
 
         let snapshot = await staffAttendanceRef.where("date", "==", date).get()
 
-        if(snapshot.empty) {
+        if (snapshot.empty) {
             throw new Error("No staff attendance records for day")
         }
 
         staffList = []
         let index = 0
-        await new Promise((resolve => { 
-            snapshot.forEach(async(s) => {
+        await new Promise((resolve => {
+            snapshot.forEach(async (s) => {
                 try {
                     let sD = s.data()
                     let its = sD.its
                     let status = sD.present
                     let staff = await staffRef.doc(its).get();
 
-                    if(staff.exists) {
-                        let staffRecord = { 
+                    if (staff.exists) {
+                        let staffRecord = {
                             its: its,
                             name: staff.data().name,
                             status: status,
@@ -899,12 +907,12 @@ router.get("/staffAttendanceReport", headMAuth, async(req, res) => {
                         }
                         staffList.push(staffRecord)
                     }
-                    
+
                 } catch (err) {
                     throw err;
                 } finally {
                     index += 1
-                    if(index == snapshot.size) {
+                    if (index == snapshot.size) {
                         resolve();
                     }
                 }

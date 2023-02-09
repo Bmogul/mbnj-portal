@@ -19,25 +19,6 @@ if(page == 'parentlogin.html'){
     uname = document.getElementById('email')
     email = true;
 }
-const validate = ()=>{
-    if(email){
-        if(!uname.value ){
-            alert('Please input valid Email')
-            return false;
-        }
-    }
-    else{
-        if(!uname.value || !/^[0-9]{8}$/.test(uname.value)){
-            alert('Please input a valid ITS')
-            return false;
-        }
-    }
-    if(!psswd.value || psswd.value.length < 8){
-        alert('Please input a valid Password')
-        return false;
-    }
-    return true;
-}
 
 submit.onclick = () =>{
     // if valid inputs
