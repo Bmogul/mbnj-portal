@@ -1,6 +1,7 @@
 require('dotenv').config()
 const express = require("express")
 const path = require('path')
+const exphbs = require('express-handlebars')
 db = require('./db/db.js')
 
 const attendanceRouter = require('./routers/attendance')
@@ -14,6 +15,9 @@ const studentRouter = require('./routers/student')
 
 const app = express();
 const port = process.env.PORT || 3001;
+
+app.engine('handlebars', exphbs({defaultLayout: 'main'}))
+app.set('view engine', 'handlebars')
 
 app.use(function(req,res,next){
     res.header("Access-Control-Allow-Origin", "*")
@@ -51,6 +55,11 @@ app.get('/parentLogin', function(req,res){
     let cPath = './client/public/pages/parentlogin.html'
     console.log(path.resolve(cPath))
     res.sendFile(path.resolve(cPath))
+})
+
+app.get('/portal', function(req,res){
+    console.log(req.staff)
+    // res.render('portal', {Name: , tabs:render.GenerateTabs()})
 })
 
 app.listen(port, () => {

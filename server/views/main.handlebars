@@ -1,14 +1,3 @@
-const fs = require('fs');
-
-fs.readFile('./components/page.html', 'utf8', (err, html) => {
-  if (err) throw err;
-
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-
-  const content = doc.querySelector('body').innerHTML;
-
-  fs.writeFile('./generated.html', `
     <html>
       <head>
         <meta charset="UTF-8">
@@ -28,8 +17,8 @@ fs.readFile('./components/page.html', 'utf8', (err, html) => {
                 <i class="fa fa-caret-down"></i>
               </button>
               <div class="dropdown-content">
-                  <a>Moiz Sabir</a>
-                  <a href="./login.html" onclick="logout()">Logout</a>
+                  <a>{{Name}}</a>
+                  <a href="./login" onclick="logout()">Logout</a>
               </div>
             </div> 
       </li>
@@ -46,8 +35,3 @@ fs.readFile('./components/page.html', 'utf8', (err, html) => {
         </div>
       </body>
     </html>
-  `, 'utf8', (err) => {
-    if (err) throw err;
-    console.log('The generated HTML file has been saved.');
-  });
-});
