@@ -27,7 +27,7 @@
     "crypto": "^1.0.1",
     "dotenv": "^16.0.3",
     "express": "^4.18.1",
-    "express-handlebars": "^6.0.7",
+    "express-handlebars": "^5.3.3",
     "firebase-admin": "^11.0.1",
     "googleapis": "^110.0.0",
     "jsonwebtoken": "^8.5.1",

@@ -4,6 +4,7 @@ const path = require('path')
 const exphbs = require('express-handlebars')
 db = require('./db/db.js')
 
+const pagesRouter = require('./routers/pages')
 const attendanceRouter = require('./routers/attendance')
 const classRouter = require('./routers/class')
 const familyRouter = require('./routers/family')
@@ -29,6 +30,7 @@ app.use(express.static(path.resolve()+'/client/public/'));
 app.use(express.json())
 // app.use(eventRouter)
 
+app.use(pagesRouter)
 app.use(attendanceRouter)
 app.use(classRouter)
 app.use(familyRouter)
@@ -45,22 +47,22 @@ app.get('/', function(req,res){
     res.sendFile(path.resolve(cPath))
 })
 
-app.get('/login', function(req,res){
-    let cPath = './client/public/pages/login.html'
-    console.log(path.resolve(cPath))
-    res.sendFile(path.resolve(cPath))
-})
+// app.get('/login', function(req,res){
+//     let cPath = './client/public/pages/login.html'
+//     console.log(path.resolve(cPath))
+//     res.sendFile(path.resolve(cPath))
+// })
 
-app.get('/parentLogin', function(req,res){
-    let cPath = './client/public/pages/parentlogin.html'
-    console.log(path.resolve(cPath))
-    res.sendFile(path.resolve(cPath))
-})
+// app.get('/parentLogin', function(req,res){
+//     let cPath = './client/public/pages/parentlogin.html'
+//     console.log(path.resolve(cPath))
+//     res.sendFile(path.resolve(cPath))
+// })
 
-app.get('/portal', function(req,res){
-    console.log(req.staff)
-    // res.render('portal', {Name: , tabs:render.GenerateTabs()})
-})
+// app.get('/portal', function(req,res){
+//     console.log(req.body)
+//     // res.render('portal', {Name: , tabs:render.GenerateTabs()})
+// })
 
 app.listen(port, () => {
     console.log("Listening on port 3001.");

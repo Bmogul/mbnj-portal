@@ -3,9 +3,9 @@
 // const { stubString } = require("lodash");
 
 let token = sessionStorage.getItem('login_token')
-if(token){
-    document.location.href = './portal.html'
-}
+// if(token){
+//     document.location.href = './portal.html'
+// }
 
 const loginForm = document.getElementById('loginForm');
 const submit = document.getElementById('submitBtn');
@@ -21,10 +21,7 @@ if(page == 'parentlogin.html'){
 }
 
 submit.onclick = () =>{
-    // if valid inputs
-    if(validate()){
-        // check to see if in db and get login token
-        validLogin = false;
+
         fetch('/staff/login', {
             method:'POST',
             headers:{
@@ -33,18 +30,22 @@ submit.onclick = () =>{
             body:JSON.stringify({its:uname.value,password:psswd.value})
         }).then(status =>{
             status.json().then(data => {   
-                console.log(data)
-                alert('allGOOD')
+                console.log(data, status)
+                if(data.error){
+                    throw new Error(data.error);
+                }
+                alert("ALL GOOD")
                 sessionStorage.setItem('login_token', data.token) 
-                validLogin = true; 
+            // Once login token is stored, make a request to access portal page
+            fetch('/portal', {
+                method: 'GET',
+                headers:{
+                    'Content-Type': 'application/json'
+                }
+            })
+        }).catch(e=>{
+            alert(e.toString().substring(14))
         })}).catch(e =>{
-            console.log('ERROR', e)
         })
-        console.log(validLogin)
-        alert('Logged in')
         return false;
-    }else{
-        alert("Invalid Login Credentials")
-        return false;
-    }
 }
