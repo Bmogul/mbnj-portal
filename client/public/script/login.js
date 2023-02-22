@@ -40,9 +40,13 @@ submit.onclick = () =>{
             fetch('/portal', {
                 method: 'GET',
                 headers:{
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': sessionStorage.getItem('login_token')
                 }
-            })
+            }).then(res => res.text())
+            .then(html => {
+                console.log(html)
+            }).catch(e=>console.log(e))
         }).catch(e=>{
             alert(e.toString().substring(14))
         })}).catch(e =>{

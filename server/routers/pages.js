@@ -1,6 +1,8 @@
 const express = require('express');
 const app = new express.Router();
 const crypto = require('crypto')
+const path = require('path')
+
 const { staffAuth, attendanceAuth, headMAuth, adminAuth, committeeAuth } = require('../middleware/staffAuth');
 
 app.get('/login', function(req,res){
@@ -16,9 +18,19 @@ app.get('/parentLogin', function(req,res){
 })
 
 app.get('/portal', staffAuth, function(req,res){
-    console.log(req.staff)
-    // res.render('portal', {Name: , tabs:render.GenerateTabs()})
+    let roles = req.staff.role
+    let tabs = [];
+    console.log(roles)
+    if(roles.includes('admin')){
+        tabs.push('DivCa')
+        tabs.push('DivCh')
+        tabs.push('DivSa')
+        tabs.push('DivSl')
+    }
+    console.log(tabs)
+    res.render('main', {Name: req.staff.name, tabs})
 })
+
 
 
 module.exports = app;

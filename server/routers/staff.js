@@ -77,7 +77,6 @@ generateAuthToken = async (its, role) => {
 }
 
 router.post('/staff/login', async (req, res) => {
-    console.log("Req BODY",req.body)
     try {
         if (!req.body.its || !/^[0-9]{8}$/.test(req.body.its)) {
             // alert('Please input a valid ITS')
